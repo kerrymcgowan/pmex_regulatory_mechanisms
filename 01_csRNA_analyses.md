@@ -1,5 +1,5 @@
 ### Raw Reads
-Raw single-end 75 bp input and csRNA reads from gill tissues can be downloaded using the NCBI accession PRJNA743555. mRNA reads from the same gill tissues were used as part of the "full approach" for peak finding, described below, can be downloaded using the NCBI accession PRJNA290391.
+Single-end 75 bp input and csRNA reads from gill tissues can be downloaded using the NCBI accession PRJNA743555. mRNA reads from the same gill tissues were used as part of the "full approach" for peak finding, described below, can be downloaded using the NCBI accession PRJNA290391.
 
 All analyses use HOMER Tools (v.4.11) unless otherwise specified.
 
