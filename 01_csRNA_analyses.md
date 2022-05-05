@@ -332,9 +332,31 @@ write.table(x = unigene_list_all_XR, file = '06_unigene_list_for_blast2go_all_XR
 ```
 
 ### OmicsBox Functional Enrichment Analysis
-Formerly Blast2GO.
+Formerly Blast2GO. Pull FASTA sequences for all XM and XR accessions from above. `sequence.fasta` contains all of the RefSeq FASTA sequences for *Poecilia mexicana* downloaded from NCBI's Nucleotide database.
 ```{blast}
+# Turn multi-line FASTA to single line FASTA
+awk '/^>/ {printf("\n%s\n",$0);next; } { printf("%s",$0);}  END {printf("\n");}' < sequence.fasta > sequence_single_line.fasta
+
+# Subset to mRNAs corresponding to csRNA-seq peaks
+while read line || [ -n "$line" ];
+do
+        gene=$(echo $line | awk '{print $1}')
+
+        grep $gene -A 1 sequence_single_line.fasta >> nearest_unigenes_to_all_peaks_XM.fa
+
+done < 06_unigene_list_for_blast2go_all_XM_peaks.txt
+
+# Subset to ncRNAs corresponding to csRNA-seq peaks
+while read line || [ -n "$line" ];
+do
+        gene=$(echo $line | awk '{print $1}')
+
+        grep $gene -A 1 sequence_single_line.fasta >> nearest_unigenes_to_all_peaks_XR.fa
+
+done < 06_unigene_list_for_blast2go_all_XR_peaks.txt
 ```
+
+The resulting subset FASTA files were used as input for a functional enrichment analysis in OmicsBox.
 
 
 
