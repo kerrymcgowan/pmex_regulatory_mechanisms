@@ -247,14 +247,14 @@ cand_list <- read.csv(OXPHOS_Reference_and_Detox_Gene_IDS.csv', header = 1)
 # Subset to only include Sulfide Detox/Response Gene Set
 subset_cand <- subset(cand_list, Gene.Set == "Sulfide Detox/Response")
 
-# Change "sqor" to "sqrdl" in Gene.name.from.accession column
+# Change name of sulfide:quinone oxidoreductase from "sqor" to "sqrdl" in Gene.name.from.accession column
 subset_cand[subset_cand == "sqor"] <- "sqrdl"
 
 # Merge H2S candidate list with significant csRNA peaks
 merged_eco <- merge(x = sig_eco, y = subset_cand, by.x = "Gene_Name", by.y = "Gene.name.from.accession")
 ```
 
-Merge with *Poecilia mexicana* annotations.
+Merge with Blast annotations from Passow *et al.*
 ```{r}
 pmex_anno <- read.csv('Table S2 - Poecilia mexicana Annotations.csv')
 
@@ -270,11 +270,11 @@ Determine if the number of differentially expressed peaks in the Sulfide Detox/R
 
 2 x 2 contingency table (Set = Sulfide Detox/Response Gene Set):
 
-                                      Differential Expression            No Differential Expression
--------------------------             -------------------------          -------------------------
-In Set                                     18                                      346
-Not in Set                              1,488                                   65,049
-   
+|                | Differential Expression  | No Differential Expression |
+| -------------- | ------------------------ | -------------------------- |
+| In Set         | 18                       | 346                        |
+| Not in Set     | 1,488                    | 65,049                     |
+
 ```{r}
 # Intersect non-significant peaks with the Sulfide Detox/Response Gene Set to complete the 2 x 2 contingency table above
 # Subset to non-significant peaks only (FDR >= 0.05)
@@ -292,7 +292,7 @@ table <- matrix(c(18, 1488, 346, 65049),
 fisher.test(table, alternative = "two.sided")
 ```
 
-Intersect the list of significant peaks with C. Passow's BLAST results for DAVID analyses.
+Intersect the list of significant peaks with Blast annotations.
 ```{r}
 anno_sig_eco <- merge(x = sig_eco, y = pmex_anno, by.x = "Gene_Name", by.y = "gene.name", all.x = TRUE)
 # Split Subject.sequence.ID to only contain the name of the human ortholog
