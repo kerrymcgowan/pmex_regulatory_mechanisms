@@ -169,7 +169,7 @@ library(tidyr)
 Read in EdgeR output from HOMER's getDiffExpression.pl.
 **NOTE**: The output from getDiffExpression compared sulfidic to non-sulfidic samples, so for example, a peak with a positive log-fold change (logFC) is upregulated in sulfidic samples compared to non-sulfidic samples.
 ```{r}
-diff_exp_eco <- read.delim("~/Documents/WSU/RESEARCH/pmex_gills_csrna_2021/09_homer_getdiffexpression/ns_vs_s_diffOutput_edgeR.txt", sep = "\t")
+diff_exp_eco <- read.delim("ns_vs_s_diffOutput_edgeR.txt", sep = "\t")
 ```
 
 Replace column names with readable labels.
