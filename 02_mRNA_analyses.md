@@ -133,17 +133,18 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("edgeR")
 BiocManager::install("WGCNA") 
 
+install.packages("ggplot2")
 install.packages("scales")
 install.packages("tidyr")
-install.packages("ggplot2")
 ```
 
 Load packages.
 ```{r}
 library(edgeR)
+library(dplyr)
+library(ggplot2)
 library(scales)
 library(tidyr)
-library(ggplot2)
 library(WGCNA)
 ```
 
@@ -544,9 +545,10 @@ lnames_wild = load(file = "wild-02-networkConstruction-stepByStep.RData")
 Identify modules that are significantly associated with the measured traits (sulfidic vs. non-sulfidic, drainage). To do this, correlate eigengenes with external traits.
 
 Define numbers of genes and samples.
-
+```{r}
 nGenes_wild = ncol(datExprWild)
 nSamples_wild = nrow(datExprWild)
+
 # Recalculate MEs with color labels
 #MEs0_wild = moduleEigengenes(datExprWild, moduleColors_wild)$eigengenes
 #MEs_wild = orderMEs(MEs0_wild)
@@ -554,9 +556,11 @@ nSamples_wild = nrow(datExprWild)
 MEs_wild = orderMEs(MEs_wild)
 moduleTraitCor_wild = cor(MEs_wild, datTraitsWild, use = "p")
 moduleTraitPvalue_wild = corPvalueStudent(moduleTraitCor_wild, nSamples_wild)
+```
 
 # Color code associations between modules and traits using their correlation values
-pdf(file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/8_wild_correlations_and_p_values.pdf", width = 10, height = 16)
+```{r}
+pdf(file = "8_wild_correlations_and_p_values.pdf", width = 10, height = 16)
 sizeGrWindow(10,16)
 # Will display correlations and their p-values
 textMatrix_wild = paste(signif(moduleTraitCor_wild, 2), "\n(",
@@ -576,35 +580,42 @@ cex.text = 0.5,
 zlim = c(-1,1),
 main = paste("Module-trait relationships"))
 dev.off()
+```
 
-#### Gene relationship to trait and important modules: Gene Significance and Module Membership -----------------------------------------------------------------------------------------------------------------
+#### Gene relationship to trait and important modules: Gene Significance and Module Membership
 
-cat(" ------------------------------------------------------------ Habitat (NS vs S) Wild Output ------------------------------------------------------------ \n")
-
-# Define variable habitat_wild containing the NS_vs_S_wild column of datTraitsWild
+Define variable habitat_wild containing the NS_vs_S_wild column of datTraitsWild
+```{r}
 habitat_wild = as.data.frame(datTraitsWild$NS_vs_S_wild)
 names(habitat_wild) = "habitat_wild"
 # Names (colors) of the modules
 modNames_wild = substring(names(MEs_wild), 3)
+```
 
+```{r}
 geneModuleMembership_wild = as.data.frame(cor(datExprWild, MEs_wild, use = "p"))
 MMPvalue_wild = as.data.frame(corPvalueStudent(as.matrix(geneModuleMembership_wild), nSamples_wild))
+```
 
+```{r}
 names(geneModuleMembership_wild) = paste("MM", modNames_wild, sep="")
 names(MMPvalue_wild) = paste("p.MM", modNames_wild, sep="")
-
+```
+```{r}
 geneTraitSignificance_habitat_wild = as.data.frame(cor(datExprWild, habitat_wild, use = "p"))
 GSPvalue_habitat_wild = as.data.frame(corPvalueStudent(as.matrix(geneTraitSignificance_habitat_wild), nSamples_wild))
-
+```
+```{r}
 names(geneTraitSignificance_habitat_wild) = paste("GS.", names(habitat_wild), sep="")
 names(GSPvalue_habitat_wild) = paste("p.GS.", names(habitat_wild), sep="")
+```
 
-#### Intramodular analysis: identifying genes with high GS and MM -----------------------------------------------------------------------------------------------------------------
+#### Intramodular analysis: identifying genes with high GS and MM
 
-# Identify genes that have a high significance for habitat as well as high module membership in interesting modules
+Identify genes that have a high significance for habitat as well as high module membership in interesting modules.
 
-# Most positively correlated module with habitat
-library(dplyr)
+Most positively correlated module with habitat.
+```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
 # Sort by NS_vs_S_wild column in descending order
 moduleTraitCor_wild2_desc_habitat <- moduleTraitCor_wild2[order(-moduleTraitCor_wild2$NS_vs_S_wild),]
@@ -624,8 +635,9 @@ modulePositiveWildHabitat <- gsub("ME", "", positive_wild_habitat)
 #modulePositiveWildHabitat
 columnPositiveWildHabitat = match(modulePositiveWildHabitat, modNames_wild)
 moduleGenesPositiveWildHabitat = moduleColors_wild==modulePositiveWildHabitat
-
-pdf(file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/9_wild_habitat_positive_corr_module.pdf", width = 7, height = 7)
+```
+```{r}
+pdf(file = "9_wild_habitat_positive_corr_module.pdf", width = 7, height = 7)
 sizeGrWindow(7, 7)
 par(mfrow = c(1,1))
 verboseScatterplot(abs(geneModuleMembership_wild[moduleGenesPositiveWildHabitat, columnPositiveWildHabitat]),
@@ -635,9 +647,10 @@ ylab = "Gene significance for habitat (NS vs S)",
 main = paste("Module membership vs. gene significance\n"),
 cex.main = 1.2, cex.lab = 1.2, cex.axis = 1.2, col = modulePositiveWildHabitat)
 dev.off()
+```
 
-# Most negatively correlated module with habitat
-library(dplyr)
+Most negatively correlated module with habitat.
+```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
 # Sort by NS_vs_S_wild column in ascending order
 moduleTraitCor_wild2_asc_habitat <- moduleTraitCor_wild2[order(moduleTraitCor_wild2$NS_vs_S_wild),]
@@ -657,8 +670,10 @@ moduleNegativeWildHabitat <- gsub("ME", "", negative_wild_habitat)
 #moduleNegativeWildHabitat
 columnNegativeWildHabitat = match(moduleNegativeWildHabitat, modNames_wild)
 moduleGenesNegativeWildHabitat = moduleColors_wild==moduleNegativeWildHabitat
+```
 
-pdf(file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/9_wild_habitat_negative_corr_module.pdf", width = 7, height = 7)
+```{r}
+pdf(file = "9_wild_habitat_negative_corr_module.pdf", width = 7, height = 7)
 sizeGrWindow(7, 7)
 par(mfrow = c(1,1))
 verboseScatterplot(abs(geneModuleMembership_wild[moduleGenesNegativeWildHabitat, columnNegativeWildHabitat]),
@@ -668,22 +683,17 @@ ylab = "Gene significance for habitat (NS vs S)",
 main = paste("Module membership vs. gene significance\n"),
 cex.main = 1.2, cex.lab = 1.2, cex.axis = 1.2, col = moduleNegativeWildHabitat)
 dev.off()
+```
 
-#### Summary output of network analysis results -----------------------------------------------------------------------------------------------------------------
+#### Summary output of network analysis results
 
-# Return all gene IDs included in the analysis
+Return all gene IDs included in the analysis.
+```{r}
 #names(datExprWild)
+```
 
-## Return gene IDs belonging to the each module
-#cat("\n")
-#cat("Wild: gene IDs in the module most positively correlated with habitat:\n")
-#names(datExprWild)[moduleColors_wild==modulePositiveWildHabitat]
-#cat("\n")
-#cat("Wild: gene IDs in the module most negatively correlated with habitat:\n")
-#names(datExprWild)[moduleColors_wild==moduleNegativeWildHabitat]
-#cat("\n")
-
-# Import annotation file
+Import annotation file.
+```{r}
 annot = read.csv(file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/scripts/annotations_from_cpassow.csv")
 cat("\n")
 cat("Dimensions of the annotation file:\n")
@@ -704,6 +714,7 @@ cat("\n")
 # Should return 0.
 # Mine doesn't I think because C Passow's annotation file contains more genes than genesWild
 	# Yes, confirmed with JLK, the annotation file only contains genes which have a BLAST hit, which is not all of the genes in genesWild
+```
 
 # Create the starting data frame
 geneInfoHabitatWild0 = data.frame(geneID = genesWild,
