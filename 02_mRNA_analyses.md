@@ -383,7 +383,6 @@ adjacency_wild = adjacency(datExprWild, power = softPower_wild, type = "signed")
 ```
 
 #### Topological Overlap Matrix (TOM)
-
 Turn adjacency into topological overlap.
 ```{r}
 TOM_wild = TOMsimilarity(adjacency_wild, TOMType = "unsigned")
@@ -440,7 +439,6 @@ dev.off()
 ```
 
 #### Merging of modules whose expression profiles are very similar
-
 To quantify co-expression similarity of entire modules, calculate their eigengenes and cluster them based on their correlation.
 
 Calculate eigengenes.
@@ -521,7 +519,6 @@ save(MEs_wild, moduleLabels_wild, moduleColors_wild, geneTree_wild, file = "wild
 #### WGCNA Part 2
 
 #### Preliminaries: set up the R session and load results of previous parts
-
 The following setting is important, do not omit.
 ```{r}
 options(stringsAsFactors = FALSE)
@@ -540,7 +537,6 @@ lnames_wild = load(file = "wild-02-networkConstruction-stepByStep.RData")
 #### Relate modules to external traits
 
 #### Quantify module-trait associations
-
 Identify modules that are significantly associated with the measured traits (sulfidic vs. non-sulfidic, drainage). To do this, correlate eigengenes with external traits.
 
 Define numbers of genes and samples.
@@ -579,7 +575,6 @@ dev.off()
 ```
 
 #### Gene relationship to trait and important modules: Gene Significance and Module Membership
-
 Define variable habitat_wild containing the NS_vs_S_wild column of datTraitsWild
 ```{r}
 habitat_wild = as.data.frame(datTraitsWild$NS_vs_S_wild)
@@ -608,7 +603,6 @@ names(GSPvalue_habitat_wild) = paste("p.GS.", names(habitat_wild), sep="")
 ```
 
 #### Intramodular analysis: identifying genes with high GS and MM
-
 Identify genes that have a high significance for habitat as well as high module membership in interesting modules.
 
 Most positively correlated module with habitat.
@@ -688,7 +682,6 @@ dev.off()
 ```
 
 #### Summary output of network analysis results
-
 Return all gene IDs included in the analysis.
 ```{r}
 names(datExprWild)
@@ -699,31 +692,13 @@ Import annotation file. See `Table S2` in the `README.md`.
 annot = read.csv(file = "Table \S2")
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
 genesWild = names(datExprWild)
 genes2annotWild = match(genesWild, annot$geneID)
 
-# The following is the number of genes without annotation
-cat("This is the number of genes without annotation, should be 0:\n")
+# The following is the number of genes without annotation--in this case, the number of genes without a BLAST hit in `Table S2`
+cat("This is the number of genes without annotation:\n")
 sum(is.na(genes2annotWild))
-cat("\n")
-# Should return 0.
-# Mine doesn't I think because C Passow's annotation file contains more genes than genesWild
-	# Yes, confirmed with JLK, the annotation file only contains genes which have a BLAST hit, which is not all of the genes in genesWild
 ```
 
 Create the starting data frame.
@@ -735,8 +710,10 @@ proteinAnnotations = annot$ProteinAnnotations[genes2annotWild],
 moduleColors = moduleColors_wild,
 geneTraitSignificance_habitat_wild,
 GSPvalue_habitat_wild)
+
 # Order modules by their significance for habitat
 modOrder_habitat_wild = order(-abs(cor(MEs_wild, habitat_wild, use = "p")))
+
 # Add module membership information in the chosen order
 for (mod in 1:ncol(geneModuleMembership_wild))
 {
@@ -746,6 +723,7 @@ MMPvalue_wild[, modOrder_habitat_wild[mod]])
 names(geneInfoHabitatWild0) = c(oldNames_habitat_wild, paste("MM.", modNames_wild[modOrder_habitat_wild[mod]], sep=""),
 paste("p.MM.", modNames_wild[modOrder_habitat_wild[mod]], sep=""))
 }
+
 # Order the genes in the geneInfo variable first by module color, then by geneTraitSignificance
 geneOrder_habitat_wild = order(geneInfoHabitatWild0$moduleColors, -abs(geneInfoHabitatWild0$GS.habitat_wild))
 geneInfoHabitatWild = geneInfoHabitatWild0[geneOrder_habitat_wild, ]
@@ -756,10 +734,10 @@ Write data frame into a text-format spreadsheet.
 write.csv(geneInfoHabitatWild, file = "10_geneInfoHabitatWild.csv")
 ```
 
-#### Replace NAs in 10_geneInfoHabitatWild.csv with gene name/locus IDs from GFF file
+#### Replace NAs in 10_geneInfoHabitatWild.csv with their gene name/locus IDs from GFF file
 NAs are from genes that do not have a BLAST hit.
 
-Read in annotations from GFF file.
+Read in annotations pulled from the *P. mexicana* GFF file. See `PmexGeneNameMatching.csv` in the `README.md`.
 ```{r}
 PmexGeneNameMatching <- read.csv(file = "PmexGeneNameMatching.csv")
 ```
@@ -769,33 +747,24 @@ Make row 1 the headers for the columns.
 names(PmexGeneNameMatching) <- as.matrix(PmexGeneNameMatching[1, ])
 PmexGeneNameMatching <- PmexGeneNameMatching[-1, ]
 PmexGeneNameMatching[] <- lapply(PmexGeneNameMatching, function(x) type.convert(as.character(x)))
-cat("\n")
-cat("Beginning of PmexGeneNameMatching:\n")
-head(PmexGeneNameMatching)
-cat("\n")
 ```
 
 Merge `PmexGeneNameMatching` and `geneInfoHabitatWild` by gene ID.
 ```{r}
 mergedHabitatWild <- merge(x = geneInfoHabitatWild, y = PmexGeneNameMatching, by.x = "geneID", by.y = "gene.ID", all.x = TRUE)
-cat("\n")
-cat("Column names of mergedHabitatWild:\n")
-colnames(mergedHabitatWild)
-cat("\n")
-#head(mergedHabitatWild)
-# Select columns in a new order to replace NAs in the geneName column of mergedHabitatWild with gene.name
+```
 
-# select(data.frame, desired columns)
+Select columns in a new order to replace NAs in the geneName column of mergedHabitatWild with gene.name.
+```{r}
 mergedHabitatWild2 <- select(mergedHabitatWild, geneID,gene.name,subjectSequenceID,proteinAnnotations,moduleColors,GS.habitat_wild,p.GS.habitat_wild,matches("MM.*"),matches("p.MM.*"))
-cat("\n")
-cat("Column names of mergedHabitatWild2 (selected columns):\n")
-colnames(mergedHabitatWild2)
-cat("\n")
-# Save as a CSV file
+```
+
+Save as a CSV file.
+```{r}
 write.csv(mergedHabitatWild2, file = "11_geneInfoHabitatWild_NAs_replaced_with_LOCs.csv")
 ```
 
-**Pichucalco**
+Pichucalco Drainage<br>
 Define variable pich_wild containing the Pich_vs_all_wild column of datTraitsWild.
 ```{r}
 pich_wild = as.data.frame(datTraitsWild$Pich_vs_all_wild)
@@ -816,7 +785,7 @@ names(geneTraitSignificance_pich_wild) = paste("GS.", names(pich_wild), sep="")
 names(GSPvalue_pich_wild) = paste("p.GS.", names(pich_wild), sep="")
 ```
 
-**Puyacatengo**
+Puyacatengo Drainage<br>
 Define variable puya_wild containing the Puya_vs_all_wild column of datTraitsWild.
 ```{r}
 puya_wild = as.data.frame(datTraitsWild$Puya_vs_all_wild)
@@ -837,7 +806,7 @@ names(geneTraitSignificance_puya_wild) = paste("GS.", names(puya_wild), sep="")
 names(GSPvalue_puya_wild) = paste("p.GS.", names(puya_wild), sep="")
 ```
 
-**Tacotalpa**
+Tacotalpa Drainage<br>
 Define variable taco_wild containing the Taco_vs_all_wild column of datTraitsWild
 ```{r}
 taco_wild = as.data.frame(datTraitsWild$Taco_vs_all_wild)
@@ -859,33 +828,33 @@ names(GSPvalue_taco_wild) = paste("p.GS.", names(taco_wild), sep="")
 ```
 
 #### Intramodular analysis: identifying genes with high GS and MM
-
 Identify genes that have a high significance for drainage as well as high module membership in interesting modules.
 
-**Pichucalco**
+Pichucalco Drainage<br>
 Most positively correlated module with Pichucalco drainage.
 ```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
+
 # Sort by Pich_vs_all_wild column in descending order
 moduleTraitCor_wild2_desc_pich <- moduleTraitCor_wild2[order(-moduleTraitCor_wild2$Pich_vs_all_wild),]
+
 # Print ordered modules
-cat("\n")
 cat("Most positively correlated module with Pichucalco drainage:\n")
 moduleTraitCor_wild2_desc_pich
-cat("\n")
+
 # Move row names to their own column called "Module"
 moduleTraitCor_wild2_desc_pich <- tibble::rownames_to_column(moduleTraitCor_wild2_desc_pich, "Module")
-#colnames(moduleTraitCor_wild2_desc_pich)
+
 # Pull out module color of most positively correlated module with Pichucalco drainage
 positive_wild_pich <- moduleTraitCor_wild2_desc_pich$Module[1]
-#positive_wild_pich
+
 # Remove ME from string, left with only the name of the color
 modulePositiveWildPich <- gsub("ME", "", positive_wild_pich)
-#modulePositiveWildPich
+
 columnPositiveWildPich = match(modulePositiveWildPich, modNames_wild)
 moduleGenesPositiveWildPich = moduleColors_wild==modulePositiveWildPich
 
-pdf(file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/9_wild_pich_positive_corr_module.pdf", width = 7, height = 7)
+pdf(file = "9_wild_pich_positive_corr_module.pdf", width = 7, height = 7)
 sizeGrWindow(7, 7)
 par(mfrow = c(1,1))
 verboseScatterplot(abs(geneModuleMembership_wild[moduleGenesPositiveWildPich, columnPositiveWildPich]),
@@ -900,26 +869,27 @@ dev.off()
 Most negatively correlated module with Pichucalco drainage.
 ```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
+
 # Sort by Pich_vs_all_wild column in ascending order
 moduleTraitCor_wild2_asc_pich <- moduleTraitCor_wild2[order(moduleTraitCor_wild2$Pich_vs_all_wild),]
+
 # Print ordered modules
-cat("\n")
 cat("Most negatively correlated module with Pichucalco drainage:\n")
 moduleTraitCor_wild2_asc_pich
-cat("\n")
+
 # Move row names to their own column called "Module"
 moduleTraitCor_wild2_asc_pich <- tibble::rownames_to_column(moduleTraitCor_wild2_asc_pich, "Module")
-#colnames(moduleTraitCor_wild2_asc_pich)
+
 # Pull out module color of most negatively correlated module with Pichucalco drainage
 negative_wild_pich <- moduleTraitCor_wild2_asc_pich$Module[1]
-#negative_wild_pich
+
 # Remove ME from string, left with only the name of the color
 moduleNegativeWildPich <- gsub("ME", "", negative_wild_pich)
-#moduleNegativeWildPich
+
 columnNegativeWildPich = match(moduleNegativeWildPich, modNames_wild)
 moduleGenesNegativeWildPich = moduleColors_wild==moduleNegativeWildPich
 
-pdf(file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/9_wild_pich_negative_corr_module.pdf", width = 7, height = 7)
+pdf(file = "9_wild_pich_negative_corr_module.pdf", width = 7, height = 7)
 sizeGrWindow(7, 7)
 par(mfrow = c(1,1))
 verboseScatterplot(abs(geneModuleMembership_wild[moduleGenesNegativeWildPich, columnNegativeWildPich]),
@@ -931,31 +901,31 @@ cex.main = 1.2, cex.lab = 1.2, cex.axis = 1.2, col = moduleNegativeWildPich)
 dev.off()
 ```
 
-# Puyacatengo
+Puyacatengo Drainage<br>
 Most positively correlated module with Puyacatengo drainage.
-
 ```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
+
 # Sort by Puya_vs_all_wild column in descending order
 moduleTraitCor_wild2_desc_puya <- moduleTraitCor_wild2[order(-moduleTraitCor_wild2$Puya_vs_all_wild),]
+
 # Print ordered modules
-cat("\n")
 cat("Most positively correlated module with Puyacatengo drainage:\n")
 moduleTraitCor_wild2_desc_puya
-cat("\n")
+
 # Move row names to their own column called "Module"
 moduleTraitCor_wild2_desc_puya <- tibble::rownames_to_column(moduleTraitCor_wild2_desc_puya, "Module")
-#colnames(moduleTraitCor_wild2_desc_puya)
+
 # Pull out module color of most positively correlated module with Puyacatengo drainage
 positive_wild_puya <- moduleTraitCor_wild2_desc_puya$Module[1]
-#positive_wild_puya
+
 # Remove ME from string, left with only the name of the color
 modulePositiveWildPuya <- gsub("ME", "", positive_wild_puya)
-#modulePositiveWildPuya
+
 columnPositiveWildPuya = match(modulePositiveWildPuya, modNames_wild)
 moduleGenesPositiveWildPuya = moduleColors_wild==modulePositiveWildPuya
 
-pdf(file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/9_wild_puya_positive_corr_module.pdf", width = 7, height = 7)
+pdf(file = "9_wild_puya_positive_corr_module.pdf", width = 7, height = 7)
 sizeGrWindow(7, 7)
 par(mfrow = c(1,1))
 verboseScatterplot(abs(geneModuleMembership_wild[moduleGenesPositiveWildPuya, columnPositiveWildPuya]),
@@ -1001,30 +971,31 @@ cex.main = 1.2, cex.lab = 1.2, cex.axis = 1.2, col = moduleNegativeWildPuya)
 dev.off()
 ```
 
-**Tacotalpa**
+Tacotalpa Drainage
 Most positively correlated module with Tacotalpa drainage.
 ```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
+
 # Sort by Taco_vs_all_wild column in descending order
 moduleTraitCor_wild2_desc_taco <- moduleTraitCor_wild2[order(-moduleTraitCor_wild2$Taco_vs_all_wild),]
+
 # Print ordered modules
-cat("\n")
 cat("Most positively correlated module with Tacotalpa drainage:\n")
 moduleTraitCor_wild2_desc_taco
-cat("\n")
+
 # Move row names to their own column called "Module"
 moduleTraitCor_wild2_desc_taco <- tibble::rownames_to_column(moduleTraitCor_wild2_desc_taco, "Module")
-#colnames(moduleTraitCor_wild2_desc_taco)
+
 # Pull out module color of most positively correlated module with Tacotalpa drainage
 positive_wild_taco <- moduleTraitCor_wild2_desc_taco$Module[1]
-#positive_wild_taco
+
 # Remove ME from string, left with only the name of the color
 modulePositiveWildTaco <- gsub("ME", "", positive_wild_taco)
-#modulePositiveWildTaco
+
 columnPositiveWildTaco = match(modulePositiveWildTaco, modNames_wild)
 moduleGenesPositiveWildTaco = moduleColors_wild==modulePositiveWildTaco
 
-pdf(file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/9_wild_taco_positive_corr_module.pdf", width = 7, height = 7)
+pdf(file = "9_wild_taco_positive_corr_module.pdf", width = 7, height = 7)
 sizeGrWindow(7, 7)
 par(mfrow = c(1,1))
 verboseScatterplot(abs(geneModuleMembership_wild[moduleGenesPositiveWildTaco, columnPositiveWildTaco]),
@@ -1039,26 +1010,27 @@ dev.off()
 Most negatively correlated module with Tacotalpa drainage.
 ```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
+
 # Sort by Taco_vs_all_wild column in ascending order
 moduleTraitCor_wild2_asc_taco <- moduleTraitCor_wild2[order(moduleTraitCor_wild2$Taco_vs_all_wild),]
+
 # Print ordered modules
-cat("\n")
 cat("Most negatively correlated module with Tacotalpa drainage:\n")
 moduleTraitCor_wild2_asc_taco
-cat("\n")
+
 # Move row names to their own column called "Module"
 moduleTraitCor_wild2_asc_taco <- tibble::rownames_to_column(moduleTraitCor_wild2_asc_taco, "Module")
-#colnames(moduleTraitCor_wild2_asc_taco)
+
 # Pull out module color of most negatively correlated module with Tacotalpa drainage
 negative_wild_taco <- moduleTraitCor_wild2_asc_taco$Module[1]
-#negative_wild_taco
+
 # Remove ME from string, left with only the name of the color
 moduleNegativeWildTaco <- gsub("ME", "", negative_wild_taco)
-#moduleNegativeWildTaco
+
 columnNegativeWildTaco = match(moduleNegativeWildTaco, modNames_wild)
 moduleGenesNegativeWildTaco = moduleColors_wild==moduleNegativeWildTaco
 
-pdf(file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/9_wild_taco_negative_corr_module.pdf", width = 7, height = 7)
+pdf(file = "9_wild_taco_negative_corr_module.pdf", width = 7, height = 7)
 sizeGrWindow(7, 7)
 par(mfrow = c(1,1))
 verboseScatterplot(abs(geneModuleMembership_wild[moduleGenesNegativeWildTaco, columnNegativeWildTaco]),
@@ -1070,17 +1042,29 @@ cex.main = 1.2, cex.lab = 1.2, cex.axis = 1.2, col = moduleNegativeWildTaco)
 dev.off()
 ```
 
-#### Summary output of network analysis results
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### Summary output of network analysis results
 Return all gene IDs included in the analysis.
 ```{r}
 names(datExprWild)
 ```
 
-**Pichucalco**
-Return gene IDs belonging to the each module.
+Pichucalco Drainage<br>
+Return gene IDs belonging to each module.
 ```{r}
-#cat("\n")
 #cat("Wild: gene IDs in the module most positively correlated with the Pichucalco drainage:\n")
 #names(datExprWild)[moduleColors_wild==modulePositiveWildPich]
 #cat("\n")
@@ -1090,7 +1074,7 @@ Return gene IDs belonging to the each module.
 ```
 
 **Puyacatengo**
-Return gene IDs belonging to the each module.
+Return gene IDs belonging to each module.
 ```{r}
 #cat("\n")
 #cat("Wild: gene IDs in the module most positively correlated with the Puyacatengo drainage:\n")
@@ -1102,7 +1086,7 @@ Return gene IDs belonging to the each module.
 ```
 
 **Tacotalpa**
-Return gene IDs belonging to the each module.
+Return gene IDs belonging to each module.
 ```{r}
 #cat("\n")
 #cat("Wild: gene IDs in the module most positively correlated with the Tacotalpa drainage:\n")
