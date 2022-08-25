@@ -756,7 +756,7 @@ write.csv(mergedHabitatWild2, file = "11_geneInfoHabitatWild_NAs_replaced_with_L
 ```
 
 #### (2) Comparing drainages (Pichucalco, Puyacatengo, Tacotalpa)
-*Pichucalco Drainage*<br>
+***Pichucalco Drainage***<br>
 ```{r}
 # Define variable pich_wild containing the Pich_vs_all_wild column of datTraitsWild
 pich_wild = as.data.frame(datTraitsWild$Pich_vs_all_wild)
@@ -778,7 +778,7 @@ names(geneTraitSignificance_pich_wild) = paste("GS.", names(pich_wild), sep="")
 names(GSPvalue_pich_wild) = paste("p.GS.", names(pich_wild), sep="")
 ```
 
-*Puyacatengo Drainage*<br>
+***Puyacatengo Drainage***<br>
 ```{r}
 # Define variable puya_wild containing the Puya_vs_all_wild column of datTraitsWild
 puya_wild = as.data.frame(datTraitsWild$Puya_vs_all_wild)
@@ -800,7 +800,7 @@ names(geneTraitSignificance_puya_wild) = paste("GS.", names(puya_wild), sep="")
 names(GSPvalue_puya_wild) = paste("p.GS.", names(puya_wild), sep="")
 ```
 
-*Tacotalpa Drainage*<br>
+***Tacotalpa Drainage***<br>
 ```{r}
 # Define variable taco_wild containing the Taco_vs_all_wild column of datTraitsWild
 taco_wild = as.data.frame(datTraitsWild$Taco_vs_all_wild)
@@ -824,7 +824,7 @@ names(GSPvalue_taco_wild) = paste("p.GS.", names(taco_wild), sep="")
 #### Intramodular analysis: identifying genes with high GS and MM
 Identify genes that have a high significance for drainage as well as high module membership in interesting modules.
 
-*Pichucalco Drainage*<br>
+***Pichucalco Drainage***<br>
 Most positively correlated module with Pichucalco drainage.
 ```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
@@ -901,7 +901,7 @@ cex.main = 1.2, cex.lab = 1.2, cex.axis = 1.2, col = moduleNegativeWildPich)
 dev.off()
 ```
 
-*Puyacatengo Drainage*<br>
+***Puyacatengo Drainage***<br>
 Most positively correlated module with Puyacatengo drainage.
 ```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
@@ -977,7 +977,7 @@ cex.main = 1.2, cex.lab = 1.2, cex.axis = 1.2, col = moduleNegativeWildPuya)
 dev.off()
 ```
 
-*Tacotalpa Drainage*<br>
+***Tacotalpa Drainage***<br>
 Most positively correlated module with Tacotalpa drainage.
 ```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
@@ -1055,7 +1055,7 @@ dev.off()
 ```
 
 #### Summary output of network analysis results
-*Pichucalco Drainage*<br>
+***Pichucalco Drainage***<br>
 ```{r}
 # Create the starting data frame
 geneInfoPichWild0 = data.frame(geneID = genesWild,
@@ -1089,7 +1089,7 @@ Write data frame into a text-format spreadsheet.
 write.csv(geneInfoPichWild, file = "10_geneInfoPichWild.csv")
 ```
 
-*Puyacatengo Drainage*<br>
+***Puyacatengo Drainage***<br>
 ```{r}
 # Create the starting data frame
 geneInfoPuyaWild0 = data.frame(geneID = genesWild,
@@ -1123,7 +1123,7 @@ Write data frame into a text-format spreadsheet.
 write.csv(geneInfoPuyaWild, file = "10_geneInfoPuyaWild.csv")
 ```
 
-*Tacotalpa Drainage*<br>
+***Tacotalpa Drainage***<br>
 ```{r}
 # Create the starting data frame
 geneInfoTacoWild0 = data.frame(geneID = genesWild,
@@ -1160,7 +1160,7 @@ write.csv(geneInfoTacoWild, file = "10_geneInfoTacoWild.csv")
 #### Replace NAs in 10_geneInfo\*Wild.csv with their gene name/locus IDs from the P. mexicana GFF file
 NAs are genes that do not have a BLAST hit.
 
-*Pichucalco Drainage*<br>
+***Pichucalco Drainage***<br>
 Merge `PmexGeneNameMatching` and `geneInfoPichWild` by gene ID.
 ```{r}
 mergedPichWild <- merge(x = geneInfoPichWild, y = PmexGeneNameMatching, by.x = "geneID", by.y = "gene.ID", all.x = TRUE)
@@ -1176,7 +1176,7 @@ Save as a CSV file.
 write.csv(mergedPichWild2, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/11_geneInfoPichWild_NAs_replaced_with_LOCs.csv")
 ```
 
-*Puyacatengo Drainage*<br>
+***Puyacatengo Drainage***<br>
 Merge `PmexGeneNameMatching` and `geneInfoPuyaWild` by gene ID.
 ```{r}
 mergedPuyaWild <- merge(x = geneInfoPuyaWild, y = PmexGeneNameMatching, by.x = "geneID", by.y = "gene.ID", all.x = TRUE)
@@ -1192,7 +1192,7 @@ Save as a CSV file.
 write.csv(mergedPuyaWild2, file = "11_geneInfoPuyaWild_NAs_replaced_with_LOCs.csv")
 ```
 
-*Tacotalpa Drainage*<br>
+***Tacotalpa Drainage***<br>
 Merge `PmexGeneNameMatching` and `geneInfoTacoWild` by gene ID.
 ```{r}
 mergedTacoWild <- merge(x = geneInfoTacoWild, y = PmexGeneNameMatching, by.x = "geneID", by.y = "gene.ID", all.x = TRUE)
@@ -1247,7 +1247,7 @@ geneInfoHabitatWild_merged <- merge(x = geneInfoHabitatWild_subset, y = trrust, 
 
 #### Pull out TFs in modules significantly correlated to habitat
 ```{r}
-# Pull out Pearson correlation p-values for all modules, rounded to 1 significant figure.
+# Pull out Pearson correlation p-values for all modules, rounded to 1 significant figure
 moduleTraitPvalue_wild2 <- as.data.frame(signif(moduleTraitPvalue_wild, 1))
 
 # Sort by NS_vs_S_wild column in ascending order
@@ -1307,9 +1307,8 @@ HabitatWild_sig_corr2 <- HabitatWild_sig_corr[,c(1,2)]
 p-values.
 ```{r}
 moduleTraitPvalue_wild3 <- tibble::rownames_to_column(moduleTraitPvalue_wild2, "Module")
-# !! forces sig_wild_habitat to be read as a variable
-# %in% "keeps any of the following items"
 HabitatWild_sig_p <- moduleTraitPvalue_wild3 %>% filter(Module %in% (!!sig_wild_habitat))
+
 # Keep only modules and NS_vs_S_wild column
 HabitatWild_sig_p2 <- HabitatWild_sig_p[,c(1,2)]
 ```
@@ -1339,503 +1338,362 @@ HabitatWild_corr_p_uniq_desc <- HabitatWild_corr_p_uniq[order(-HabitatWild_corr_
 write.csv(x = HabitatWild_corr_p_uniq_desc, file = "15_wild_habitat_all_sig_modules_corr_pvalues_tfs.csv")
 ```
 
+#### (2) Comparing drainages (Pichucalco, Puyacatengo, Tacotalpa)
+***Pichucalco Drainage***<br>
+Load CSV file with module information generated via WGCNA.
+```{r}
+geneInfoPichWild <- read.csv("11_geneInfoPichWild_NAs_replaced_with_LOCs.csv")
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-cat(" ------------------------------------------------------------ Drainage Wild Output ------------------------------------------------------------ \n")
-
-#### Pichucalco -----------------------------------------------------------------------------------------------------------------
-# Load CSV file with module information generated via WGCNA
-geneInfoPichWild <- read.csv("/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/11_geneInfoPichWild_NAs_replaced_with_LOCs.csv")
-
-#### Pull out NCBI gene IDs from WGCNA dataset
+Pull out NCBI gene IDs from WGCNA dataset.
+```{r}
 # Split SubjectSequenceID by |
-
 geneInfoPichWild_split <- cSplit(geneInfoPichWild, 'subjectSequenceID', sep = "|", type.convert = FALSE)
-#colnames(geneInfoPichWild_split)
-#head(geneInfoPichWild_split)
+
 # Split SubjectSequenceID_3 by _
 geneInfoPichWild_split2 <- cSplit(geneInfoPichWild_split, 'subjectSequenceID_3', sep = "_", type.convert = FALSE)
-#colnames(geneInfoPichWild_split2)
-#head(geneInfoPichWild_split2)
-# Subset columns to keep subjectSequenceID_3_1 (the NCBI gene IDs)
 
-# select(data.frame, desired columns)
+# Subset columns to keep subjectSequenceID_3_1 (the NCBI gene IDs)
 geneInfoPichWild_subset <- select(geneInfoPichWild_split2, geneID,gene.name,subjectSequenceID_3_1,proteinAnnotations,moduleColors,GS.pich_wild,p.GS.pich_wild,matches("MM.*"),matches("p.MM.*"))
-#colnames(geneInfoPichWild_subset)
-#head(geneInfoPichWild_subset)
+
 # Rename subjectSequenceID_3_1
 colnames(geneInfoPichWild_subset)[3] <- "subjectSequenceID"
-#colnames(geneInfoPichWild_subset)
+```
 
-# Merge WGCNA output and TRRUST dataframe, retain all lines in geneInfoPichWild_subset
+Merge WGCNA output and TRRUST dataframe, retain all lines in geneInfoPichWild_subset.
+```{r}
 geneInfoPichWild_merged <- merge(x = geneInfoPichWild_subset, y = trrust, by.x = "subjectSequenceID", by.y = "transcription_factor", all.x = TRUE, allow.cartesian = TRUE)
-#colnames(geneInfoPichWild_merged)
-#head(geneInfoPichWild_merged)
+```
 
 #### Pull out TFs in modules significantly correlated to the Pichucalco drainage
-
-# Pull out Pearson correlation p-values for all modules, rounded to 1 significant figure (to match 8_wild_correlations_and_p_values.pdf)
+```{r}
+# Pull out Pearson correlation p-values for all modules, rounded to 1 significant figure
 moduleTraitPvalue_wild2 <- as.data.frame(signif(moduleTraitPvalue_wild, 1))
+
 # Sort by Pich_vs_all_wild column in ascending order
 moduleTraitPvalue_wild2_asc_pich <- moduleTraitPvalue_wild2[order(moduleTraitPvalue_wild2$Pich_vs_all_wild),]
+
 # Print ordered modules
-cat("\n")
 cat("Pich modules ordered by p-value:\n")
 moduleTraitPvalue_wild2_asc_pich
-cat("\n")
+
 moduleTraitPvalue_wild2_asc_pich <- tibble::rownames_to_column(moduleTraitPvalue_wild2_asc_pich, "Module")
-colnames(moduleTraitPvalue_wild2_asc_pich)
+
 # Pull out colors of modules with significant correlations (p < 0.05) to the Pichucalco drainage
 moduleTraitPvalue_wild2_pich_sig_only <- moduleTraitPvalue_wild2_asc_pich[moduleTraitPvalue_wild2_asc_pich$Pich_vs_all_wild < 0.05,]
 sig_wild_pich <- moduleTraitPvalue_wild2_pich_sig_only$Module
-#sig_wild_pich
+
 # Remove ME from string, left with only the name of the color
 sigModulesWildPich <- gsub("ME", "", sig_wild_pich)
-#sigModulesWildPich
+
 # Pull out TFs from significantly correlated modules
 # Subset merged data frame by columns
 # Add prefixes to modules significantly correlated with the Pichucalco drainage
 MM.sigModulesWildPich <- gsub("^", "MM.", sigModulesWildPich)
 p.MM.sigModulesWildPich <- gsub("^", "p.MM.", sigModulesWildPich)
+
 # Pull out only MM and p-values for significant columns
 # select(data.frame, desired columns)
 geneInfoPichWild_merged_sig <- select(geneInfoPichWild_merged, subjectSequenceID,geneID,gene.name,proteinAnnotations,moduleColors,all_of(MM.sigModulesWildPich),all_of(p.MM.sigModulesWildPich),target_gene,relationship,pubmed_interaction_IDs)
+
 # Subset to only the genes in significant modules using the column moduleColors
-# !! forces sigModulesWildPich to be read as a variable
-# %in% "keeps any of the following items"
 geneInfoPichWild_merged_sig2 <- geneInfoPichWild_merged_sig %>% filter(moduleColors %in% (!!sigModulesWildPich)) %>% group_by(moduleColors)
+
 # Keep only rows with target genes (a way to get only the TFs)
 geneInfoPichWild_merged_sig3 <- geneInfoPichWild_merged_sig2[complete.cases(geneInfoPichWild_merged_sig2$target_gene),]
+
 # Unique TFs
-cat("\n")
 cat("Unique TFs for WildPich from significant modules:\n")
 unique(geneInfoPichWild_merged_sig3$subjectSequenceID)
-cat("\n")
+
 # Number of unique TFs
-cat("\n")
+
 cat("Number of unique TFs for WildPich from significant modules:\n")
 length(unique(geneInfoPichWild_merged_sig3$subjectSequenceID))
-# Save subset merged dataframe as a CSV file
-	# TFs are in the subjectSequenceID column
+
+# Save subset merged dataframe as a CSV file (TFs are in the subjectSequenceID column)
 write.csv(x = geneInfoPichWild_merged_sig3, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/14_wild_pich_all_sig_corr_modules_TFs.csv")
+```
 
 #### Make table of significant module correlations and p-values
-# Correlations
+Correlations.
+```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
 moduleTraitCor_wild2 <- tibble::rownames_to_column(moduleTraitCor_wild2, "Module")
-# !! forces sig_wild_pich to be read as a variable
-# %in% "keeps any of the following items"
 PichWild_sig_corr <- moduleTraitCor_wild2 %>% filter(Module %in% (!!sig_wild_pich))
+
 # Keep only modules and Pich_vs_all_wild column
 PichWild_sig_corr2 <- PichWild_sig_corr[,c(1,3)]
-# p-values
+```
+
+p-values.
+```{r}
 moduleTraitPvalue_wild3 <- tibble::rownames_to_column(moduleTraitPvalue_wild2, "Module")
-# !! forces sig_wild_pich to be read as a variable
-# %in% "keeps any of the following items"
 PichWild_sig_p <- moduleTraitPvalue_wild3 %>% filter(Module %in% (!!sig_wild_pich))
+
 # Keep only modules and Pich_vs_all_wild column
 PichWild_sig_p2 <- PichWild_sig_p[,c(1,3)]
-# Combine correlations and p-values
+```
+
+Combine correlations and p-values.
+```{r}
 PichWild_corr_p <- merge(x = PichWild_sig_corr2, y = PichWild_sig_p2, by.x = "Module", by.y = "Module", all = TRUE)
+
 # Rename columns
 names(PichWild_corr_p)[2] <- "Correlation"
 names(PichWild_corr_p)[3] <- "p-value"
+
 # Remove "ME" prefix in Module column
 PichWild_corr_p[,1] <- sub("ME", "", PichWild_corr_p[,1])
+
 # Add counts of unique TFs
 PichWild_uniqueTFs_by_module <- geneInfoPichWild_merged_sig3 %>% group_by(moduleColors) %>% summarise(Unique_TFs = n_distinct(subjectSequenceID))
 PichWild_corr_p_uniq <- merge(x = PichWild_corr_p, y = PichWild_uniqueTFs_by_module, by.x = "Module", by.y = "moduleColors", all.x = TRUE)
+
 # Replace any NAs in Unique_TFs column with 0s
 PichWild_corr_p_uniq$Unique_TFs[is.na(PichWild_corr_p_uniq$Unique_TFs)] <- 0
+
 # Order by correlation in descending order
 PichWild_corr_p_uniq_desc <- PichWild_corr_p_uniq[order(-PichWild_corr_p_uniq$Correlation),]
+
 # Save as a CSV file
-write.csv(x = PichWild_corr_p_uniq_desc, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/15_wild_pich_all_sig_modules_corr_pvalues_tfs.csv")
+write.csv(x = PichWild_corr_p_uniq_desc, file = "15_wild_pich_all_sig_modules_corr_pvalues_tfs.csv")
+```
 
-#### No longer used below (was to only pull the most positively and most negatively correlated module)
-# # Pull out positively correlated TFs
-# # Subset merged data frame by columns
-# # Pull out most positively correlated with the Pichucalco drainage
-# MM.PositiveWildPich <- gsub("^", "MM.", modulePositiveWildPich)
-# p.MM.PositiveWildPich <- gsub("^", "p.MM.", modulePositiveWildPich)
+***Puyacatengo Drainage***<br>
+Load CSV file with module information generated via WGCNA.
+```{r}
+geneInfoPuyaWild <- read.csv("11_geneInfoPuyaWild_NAs_replaced_with_LOCs.csv")
+```
 
-# # select(data.frame, desired columns)
-# geneInfoPichWild_merged_pos <- select(geneInfoPichWild_merged, subjectSequenceID,geneID,gene.name,proteinAnnotations,moduleColors,MM.PositiveWildPich,p.MM.PositiveWildPich,target_gene,relationship,pubmed_interaction_IDs)
-# # Keep only rows with target genes (a way to get only the TFs)
-# geneInfoPichWild_merged_pos2 <- geneInfoPichWild_merged_pos[complete.cases(geneInfoPichWild_merged_pos$target_gene),]
-# # Pull out TFs in the most positively correlated module with the Pichucalco drainage
-# PositiveWildPich_TF <- geneInfoPichWild_merged_pos2[geneInfoPichWild_merged_pos2$moduleColors == modulePositiveWildPich,]
-# # Unique TFs
-# cat("\n")
-# cat("Unique TFs for PositiveWildPich:\n")
-# unique(PositiveWildPich_TF$subjectSequenceID)
-# cat("\n")
-# # Number of unique TFs
-# cat("\n")
-# cat("Number of unique TFs for PositiveWildPich:\n")
-# length(unique(PositiveWildPich_TF$subjectSequenceID))
-# # Save subset merged dataframe as a CSV file
-# 	# TFs are in the subjectSequenceID column
-# write.csv(x = PositiveWildPich_TF, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/12_wild_pich_positive_corr_module_TFs.csv")
-# 
-# # Pull out negatively correlated TFs
-# # Subset merged data frame by columns
-# # Pull out most negatively correlated with the Pichucalco drainage
-# MM.NegativeWildPich <- gsub("^", "MM.", moduleNegativeWildPich)
-# p.MM.NegativeWildPich <- gsub("^", "p.MM.", moduleNegativeWildPich)
-
-# # select(data.frame, desired columns)
-# geneInfoPichWild_merged_neg <- select(geneInfoPichWild_merged, subjectSequenceID,geneID,gene.name,proteinAnnotations,moduleColors,MM.NegativeWildPich,p.MM.NegativeWildPich,target_gene,relationship,pubmed_interaction_IDs)
-# # Keep only rows with target genes (a way to get only the TFs)
-# geneInfoPichWild_merged_neg2 <- geneInfoPichWild_merged_neg[complete.cases(geneInfoPichWild_merged_neg$target_gene),]
-# # Pull out TFs in the most negatively correlated module with the Pichucalco drainage
-# NegativeWildPich_TF <- geneInfoPichWild_merged_neg2[geneInfoPichWild_merged_neg2$moduleColors == moduleNegativeWildPich,]
-# # Unique TFs
-# cat("\n")
-# cat("Unique TFs for NegativeWildPich:\n")
-# unique(NegativeWildPich_TF$subjectSequenceID)
-# cat("\n")
-# # Number of unique TFs
-# cat("\n")
-# cat("Number of unique TFs for NegativeWildPich:\n")
-# length(unique(NegativeWildPich_TF$subjectSequenceID))
-# # Save subset merged dataframe as a CSV file
-# 	# TFs are in the subjectSequenceID column
-# write.csv(x = NegativeWildPich_TF, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/12_wild_pich_negative_corr_module_TFs.csv")
-
-#### Puyacatengo -----------------------------------------------------------------------------------------------------------------
-# Load CSV file with module information generated via WGCNA
-geneInfoPuyaWild <- read.csv("/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/11_geneInfoPuyaWild_NAs_replaced_with_LOCs.csv")
-
-#### Pull out NCBI gene IDs from WGCNA dataset
+Pull out NCBI gene IDs from WGCNA dataset.
+```{r}
 # Split SubjectSequenceID by |
-
 geneInfoPuyaWild_split <- cSplit(geneInfoPuyaWild, 'subjectSequenceID', sep = "|", type.convert = FALSE)
-#colnames(geneInfoPuyaWild_split)
-#head(geneInfoPuyaWild_split)
+
 # Split SubjectSequenceID_3 by _
 geneInfoPuyaWild_split2 <- cSplit(geneInfoPuyaWild_split, 'subjectSequenceID_3', sep = "_", type.convert = FALSE)
-#colnames(geneInfoPuyaWild_split2)
-#head(geneInfoPuyaWild_split2)
-# Subset columns to keep subjectSequenceID_3_1 (the NCBI gene IDs)
 
-# select(data.frame, desired columns)
+# Subset columns to keep subjectSequenceID_3_1 (the NCBI gene IDs)
 geneInfoPuyaWild_subset <- select(geneInfoPuyaWild_split2, geneID,gene.name,subjectSequenceID_3_1,proteinAnnotations,moduleColors,GS.puya_wild,p.GS.puya_wild,matches("MM.*"),matches("p.MM.*"))
-#colnames(geneInfoPuyaWild_subset)
-#head(geneInfoPuyaWild_subset)
+
 # Rename subjectSequenceID_3_1
 colnames(geneInfoPuyaWild_subset)[3] <- "subjectSequenceID"
-#colnames(geneInfoPuyaWild_subset)
+```
 
-# Merge WGCNA output and TRRUST dataframe, retain all lines in geneInfoPuyaWild_subset
+Merge WGCNA output and TRRUST dataframe, retain all lines in geneInfoPuyaWild_subset.
+```{r}
 geneInfoPuyaWild_merged <- merge(x = geneInfoPuyaWild_subset, y = trrust, by.x = "subjectSequenceID", by.y = "transcription_factor", all.x = TRUE, allow.cartesian = TRUE)
-#colnames(geneInfoPuyaWild_merged)
-#head(geneInfoPuyaWild_merged)
+```
 
 #### Pull out TFs in modules significantly correlated to the Puyacatengo drainage
-
-# Pull out Pearson correlation p-values for all modules, rounded to 1 significant figure (to match 8_wild_correlations_and_p_values.pdf)
+```{r}
+# Pull out Pearson correlation p-values for all modules, rounded to 1 significant figure
 moduleTraitPvalue_wild2 <- as.data.frame(signif(moduleTraitPvalue_wild, 1))
+
 # Sort by Puya_vs_all_wild column in ascending order
 moduleTraitPvalue_wild2_asc_puya <- moduleTraitPvalue_wild2[order(moduleTraitPvalue_wild2$Puya_vs_all_wild),]
+
 # Print ordered modules
-cat("\n")
 cat("Puya modules ordered by p-value:\n")
 moduleTraitPvalue_wild2_asc_puya
-cat("\n")
+
 moduleTraitPvalue_wild2_asc_puya <- tibble::rownames_to_column(moduleTraitPvalue_wild2_asc_puya, "Module")
-colnames(moduleTraitPvalue_wild2_asc_puya)
+
 # Pull out colors of modules with significant correlations (p < 0.05) to the Puyacatengo drainage
 moduleTraitPvalue_wild2_puya_sig_only <- moduleTraitPvalue_wild2_asc_puya[moduleTraitPvalue_wild2_asc_puya$Puya_vs_all_wild < 0.05,]
 sig_wild_puya <- moduleTraitPvalue_wild2_puya_sig_only$Module
-#sig_wild_puya
+
 # Remove ME from string, left with only the name of the color
 sigModulesWildPuya <- gsub("ME", "", sig_wild_puya)
-#sigModulesWildPuya
+
 # Pull out TFs from significantly correlated modules
 # Subset merged data frame by columns
 # Add prefixes to modules significantly correlated with the Puyacatengo drainage
 MM.sigModulesWildPuya <- gsub("^", "MM.", sigModulesWildPuya)
 p.MM.sigModulesWildPuya <- gsub("^", "p.MM.", sigModulesWildPuya)
+
 # Pull out only MM and p-values for significant columns
-# select(data.frame, desired columns)
 geneInfoPuyaWild_merged_sig <- select(geneInfoPuyaWild_merged, subjectSequenceID,geneID,gene.name,proteinAnnotations,moduleColors,all_of(MM.sigModulesWildPuya),all_of(p.MM.sigModulesWildPuya),target_gene,relationship,pubmed_interaction_IDs)
+
 # Subset to only the genes in significant modules using the column moduleColors
-# !! forces sigModulesWildPuya to be read as a variable
-# %in% "keeps any of the following items"
 geneInfoPuyaWild_merged_sig2 <- geneInfoPuyaWild_merged_sig %>% filter(moduleColors %in% (!!sigModulesWildPuya)) %>% group_by(moduleColors)
+
 # Keep only rows with target genes (a way to get only the TFs)
 geneInfoPuyaWild_merged_sig3 <- geneInfoPuyaWild_merged_sig2[complete.cases(geneInfoPuyaWild_merged_sig2$target_gene),]
+
 # Unique TFs
-cat("\n")
 cat("Unique TFs for WildPuya from significant modules:\n")
 unique(geneInfoPuyaWild_merged_sig3$subjectSequenceID)
-cat("\n")
+
 # Number of unique TFs
-cat("\n")
 cat("Number of unique TFs for WildPuya from significant modules:\n")
 length(unique(geneInfoPuyaWild_merged_sig3$subjectSequenceID))
-# Save subset merged dataframe as a CSV file
-	# TFs are in the subjectSequenceID column
-write.csv(x = geneInfoPuyaWild_merged_sig3, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/14_wild_puya_all_sig_corr_modules_TFs.csv")
+
+# Save subset merged dataframe as a CSV file (TFs are in the subjectSequenceID column)
+write.csv(x = geneInfoPuyaWild_merged_sig3, file = "14_wild_puya_all_sig_corr_modules_TFs.csv")
+```
 
 #### Make table of significant module correlations and p-values
-# Correlations
+Correlations.
+```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
 moduleTraitCor_wild2 <- tibble::rownames_to_column(moduleTraitCor_wild2, "Module")
-# !! forces sig_wild_puya to be read as a variable
-# %in% "keeps any of the following items"
 PuyaWild_sig_corr <- moduleTraitCor_wild2 %>% filter(Module %in% (!!sig_wild_puya))
+
 # Keep only modules and Puya_vs_all_wild column
 PuyaWild_sig_corr2 <- PuyaWild_sig_corr[,c(1,4)]
-# p-values
+```
+
+p-values.
+```{r}
 moduleTraitPvalue_wild3 <- tibble::rownames_to_column(moduleTraitPvalue_wild2, "Module")
-# !! forces sig_wild_puya to be read as a variable
-# %in% "keeps any of the following items"
 PuyaWild_sig_p <- moduleTraitPvalue_wild3 %>% filter(Module %in% (!!sig_wild_puya))
+
 # Keep only modules and Puya_vs_all_wild column
 PuyaWild_sig_p2 <- PuyaWild_sig_p[,c(1,4)]
+```
+
 # Combine correlations and p-values
+```{r}
 PuyaWild_corr_p <- merge(x = PuyaWild_sig_corr2, y = PuyaWild_sig_p2, by.x = "Module", by.y = "Module", all = TRUE)
+
 # Rename columns
 names(PuyaWild_corr_p)[2] <- "Correlation"
 names(PuyaWild_corr_p)[3] <- "p-value"
+
 # Remove "ME" prefix in Module column
 PuyaWild_corr_p[,1] <- sub("ME", "", PuyaWild_corr_p[,1])
+
 # Add counts of unique TFs
 PuyaWild_uniqueTFs_by_module <- geneInfoPuyaWild_merged_sig3 %>% group_by(moduleColors) %>% summarise(Unique_TFs = n_distinct(subjectSequenceID))
 PuyaWild_corr_p_uniq <- merge(x = PuyaWild_corr_p, y = PuyaWild_uniqueTFs_by_module, by.x = "Module", by.y = "moduleColors", all.x = TRUE)
+
 # Replace any NAs in Unique_TFs column with 0s
 PuyaWild_corr_p_uniq$Unique_TFs[is.na(PuyaWild_corr_p_uniq$Unique_TFs)] <- 0
+
 # Order by correlation in descending order
 PuyaWild_corr_p_uniq_desc <- PuyaWild_corr_p_uniq[order(-PuyaWild_corr_p_uniq$Correlation),]
+
 # Save as a CSV file
-write.csv(x = PuyaWild_corr_p_uniq_desc, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/15_wild_puya_all_sig_modules_corr_pvalues_tfs.csv")
+write.csv(x = PuyaWild_corr_p_uniq_desc, file = "15_wild_puya_all_sig_modules_corr_pvalues_tfs.csv")
+```
 
-#### No longer used below (was to only pull the most positively and most negatively correlated module)
-# # Pull out positively correlated TFs
-# # Subset merged data frame by columns
-# # Pull out most positively correlated with the Puyacatengo drainage
-# MM.PositiveWildPuya <- gsub("^", "MM.", modulePositiveWildPuya)
-# p.MM.PositiveWildPuya <- gsub("^", "p.MM.", modulePositiveWildPuya)
-
-# # select(data.frame, desired columns)
-# geneInfoPuyaWild_merged_pos <- select(geneInfoPuyaWild_merged, subjectSequenceID,geneID,gene.name,proteinAnnotations,moduleColors,MM.PositiveWildPuya,p.MM.PositiveWildPuya,target_gene,relationship,pubmed_interaction_IDs)
-# # Keep only rows with target genes (a way to get only the TFs)
-# geneInfoPuyaWild_merged_pos2 <- geneInfoPuyaWild_merged_pos[complete.cases(geneInfoPuyaWild_merged_pos$target_gene),]
-# # Pull out TFs in the most positively correlated module with the Puyacatengo drainage
-# PositiveWildPuya_TF <- geneInfoPuyaWild_merged_pos2[geneInfoPuyaWild_merged_pos2$moduleColors == modulePositiveWildPuya,]
-# # Unique TFs
-# cat("\n")
-# cat("Unique TFs for PositiveWildPuya:\n")
-# unique(PositiveWildPuya_TF$subjectSequenceID)
-# cat("\n")
-# # Number of unique TFs
-# cat("\n")
-# cat("Number of unique TFs for PositiveWildPuya:\n")
-# length(unique(PositiveWildPuya_TF$subjectSequenceID))
-# # Save subset merged dataframe as a CSV file
-# 	# TFs are in the subjectSequenceID column
-# write.csv(x = PositiveWildPuya_TF, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/12_wild_puya_positive_corr_module_TFs.csv")
-# 
-# # Pull out negatively correlated TFs
-# # Subset merged data frame by columns
-# # Pull out most negatively correlated with the Puyacatengo drainage
-# MM.NegativeWildPuya <- gsub("^", "MM.", moduleNegativeWildPuya)
-# p.MM.NegativeWildPuya <- gsub("^", "p.MM.", moduleNegativeWildPuya)
-
-# # select(data.frame, desired columns)
-# geneInfoPuyaWild_merged_neg <- select(geneInfoPuyaWild_merged, subjectSequenceID,geneID,gene.name,proteinAnnotations,moduleColors,MM.NegativeWildPuya,p.MM.NegativeWildPuya,target_gene,relationship,pubmed_interaction_IDs)
-# # Keep only rows with target genes (a way to get only the TFs)
-# geneInfoPuyaWild_merged_neg2 <- geneInfoPuyaWild_merged_neg[complete.cases(geneInfoPuyaWild_merged_neg$target_gene),]
-# # Pull out TFs in the most negatively correlated module with the Puyacatengo drainage
-# NegativeWildPuya_TF <- geneInfoPuyaWild_merged_neg2[geneInfoPuyaWild_merged_neg2$moduleColors == moduleNegativeWildPuya,]
-# # Unique TFs
-# cat("\n")
-# cat("Unique TFs for NegativeWildPuya:\n")
-# unique(NegativeWildPuya_TF$subjectSequenceID)
-# cat("\n")
-# # Number of unique TFs
-# cat("\n")
-# cat("Number of unique TFs for NegativeWildPuya:\n")
-# length(unique(NegativeWildPuya_TF$subjectSequenceID))
-# # Save subset merged dataframe as a CSV file
-# 	# TFs are in the subjectSequenceID column
-# write.csv(x = NegativeWildPuya_TF, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/12_wild_puya_negative_corr_module_TFs.csv")
-
-#### Tacotalpa -----------------------------------------------------------------------------------------------------------------
-# Load CSV file with module information generated via WGCNA
+***Tacotalpa Drainage***<br>
+Load CSV file with module information generated via WGCNA.
+```{r}
 geneInfoTacoWild <- read.csv("/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/11_geneInfoTacoWild_NAs_replaced_with_LOCs.csv")
+```
 
-#### Pull out NCBI gene IDs from WGCNA dataset
+Pull out NCBI gene IDs from WGCNA dataset.
+```{r}
 # Split SubjectSequenceID by |
-
 geneInfoTacoWild_split <- cSplit(geneInfoTacoWild, 'subjectSequenceID', sep = "|", type.convert = FALSE)
-#colnames(geneInfoTacoWild_split)
-#head(geneInfoTacoWild_split)
+
 # Split SubjectSequenceID_3 by _
 geneInfoTacoWild_split2 <- cSplit(geneInfoTacoWild_split, 'subjectSequenceID_3', sep = "_", type.convert = FALSE)
-#colnames(geneInfoTacoWild_split2)
-#head(geneInfoTacoWild_split2)
-# Subset columns to keep subjectSequenceID_3_1 (the NCBI gene IDs)
 
-# select(data.frame, desired columns)
+# Subset columns to keep subjectSequenceID_3_1 (the NCBI gene IDs)
 geneInfoTacoWild_subset <- select(geneInfoTacoWild_split2, geneID,gene.name,subjectSequenceID_3_1,proteinAnnotations,moduleColors,GS.taco_wild,p.GS.taco_wild,matches("MM.*"),matches("p.MM.*"))
-#colnames(geneInfoTacoWild_subset)
-#head(geneInfoTacoWild_subset)
+
 # Rename subjectSequenceID_3_1
 colnames(geneInfoTacoWild_subset)[3] <- "subjectSequenceID"
-#colnames(geneInfoTacoWild_subset)
+```
 
-# Merge WGCNA output and TRRUST dataframe, retain all lines in geneInfoTacoWild_subset
+Merge WGCNA output and TRRUST dataframe, retain all lines in geneInfoTacoWild_subset.
+```{r}
 geneInfoTacoWild_merged <- merge(x = geneInfoTacoWild_subset, y = trrust, by.x = "subjectSequenceID", by.y = "transcription_factor", all.x = TRUE, allow.cartesian = TRUE)
-#colnames(geneInfoTacoWild_merged)
-#head(geneInfoTacoWild_merged)
+```
 
 #### Pull out TFs in modules significantly correlated to the Tacotalpa drainage
-
-# Pull out Pearson correlation p-values for all modules, rounded to 1 significant figure (to match 8_wild_correlations_and_p_values.pdf)
+```{r}
+# Pull out Pearson correlation p-values for all modules, rounded to 1 significant figure
 moduleTraitPvalue_wild2 <- as.data.frame(signif(moduleTraitPvalue_wild, 1))
+
 # Sort by Puya_vs_all_wild column in ascending order
 moduleTraitPvalue_wild2_asc_taco <- moduleTraitPvalue_wild2[order(moduleTraitPvalue_wild2$Taco_vs_all_wild),]
+
 # Print ordered modules
-cat("\n")
 cat("Taco modules ordered by p-value:\n")
 moduleTraitPvalue_wild2_asc_taco
-cat("\n")
+
 moduleTraitPvalue_wild2_asc_taco <- tibble::rownames_to_column(moduleTraitPvalue_wild2_asc_taco, "Module")
-colnames(moduleTraitPvalue_wild2_asc_taco)
+
 # Pull out colors of modules with significant correlations (p < 0.05) to the Tacotalpa drainage
 moduleTraitPvalue_wild2_taco_sig_only <- moduleTraitPvalue_wild2_asc_taco[moduleTraitPvalue_wild2_asc_taco$Taco_vs_all_wild < 0.05,]
 sig_wild_taco <- moduleTraitPvalue_wild2_taco_sig_only$Module
-#sig_wild_taco
+
 # Remove ME from string, left with only the name of the color
 sigModulesWildTaco <- gsub("ME", "", sig_wild_taco)
-#sigModulesWildTaco
+
 # Pull out TFs from significantly correlated modules
 # Subset merged data frame by columns
 # Add prefixes to modules significantly correlated with the Tacotalpa drainage
 MM.sigModulesWildTaco <- gsub("^", "MM.", sigModulesWildTaco)
 p.MM.sigModulesWildTaco <- gsub("^", "p.MM.", sigModulesWildTaco)
+
 # Pull out only MM and p-values for significant columns
-# select(data.frame, desired columns)
 geneInfoTacoWild_merged_sig <- select(geneInfoTacoWild_merged, subjectSequenceID,geneID,gene.name,proteinAnnotations,moduleColors,all_of(MM.sigModulesWildTaco),all_of(p.MM.sigModulesWildTaco),target_gene,relationship,pubmed_interaction_IDs)
+
 # Subset to only the genes in significant modules using the column moduleColors
-# !! forces sigModulesWildTaco to be read as a variable
-# %in% "keeps any of the following items"
 geneInfoTacoWild_merged_sig2 <- geneInfoTacoWild_merged_sig %>% filter(moduleColors %in% (!!sigModulesWildTaco)) %>% group_by(moduleColors)
+
 # Keep only rows with target genes (a way to get only the TFs)
 geneInfoTacoWild_merged_sig3 <- geneInfoTacoWild_merged_sig2[complete.cases(geneInfoTacoWild_merged_sig2$target_gene),]
+
 # Unique TFs
-cat("\n")
 cat("Unique TFs for WildTaco from significant modules:\n")
 unique(geneInfoTacoWild_merged_sig3$subjectSequenceID)
-cat("\n")
+
 # Number of unique TFs
-cat("\n")
 cat("Number of unique TFs for WildTaco from significant modules:\n")
 length(unique(geneInfoTacoWild_merged_sig3$subjectSequenceID))
-# Save subset merged dataframe as a CSV file
-	# TFs are in the subjectSequenceID column
-write.csv(x = geneInfoTacoWild_merged_sig3, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/14_wild_taco_all_sig_corr_modules_TFs.csv")
+
+# Save subset merged dataframe as a CSV file (TFs are in the subjectSequenceID column)
+write.csv(x = geneInfoTacoWild_merged_sig3, file = "14_wild_taco_all_sig_corr_modules_TFs.csv")
+```
 
 #### Make table of significant module correlations and p-values
-# Correlations
+Correlations.
+```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
 moduleTraitCor_wild2 <- tibble::rownames_to_column(moduleTraitCor_wild2, "Module")
-# !! forces sig_wild_taco to be read as a variable
-# %in% "keeps any of the following items"
 TacoWild_sig_corr <- moduleTraitCor_wild2 %>% filter(Module %in% (!!sig_wild_taco))
+
 # Keep only modules and Taco_vs_all_wild column
 TacoWild_sig_corr2 <- TacoWild_sig_corr[,c(1,5)]
-# p-values
+```
+
+p-values.
+```{r}
 moduleTraitPvalue_wild3 <- tibble::rownames_to_column(moduleTraitPvalue_wild2, "Module")
-# !! forces sig_wild_taco to be read as a variable
-# %in% "keeps any of the following items"
 TacoWild_sig_p <- moduleTraitPvalue_wild3 %>% filter(Module %in% (!!sig_wild_taco))
+
 # Keep only modules and Taco_vs_all_wild column
 TacoWild_sig_p2 <- TacoWild_sig_p[,c(1,5)]
-# Combine correlations and p-values
+```
+
+Combine correlations and p-values.
+```{r}
 TacoWild_corr_p <- merge(x = TacoWild_sig_corr2, y = TacoWild_sig_p2, by.x = "Module", by.y = "Module", all = TRUE)
+
 # Rename columns
 names(TacoWild_corr_p)[2] <- "Correlation"
 names(TacoWild_corr_p)[3] <- "p-value"
+
 # Remove "ME" prefix in Module column
 TacoWild_corr_p[,1] <- sub("ME", "", TacoWild_corr_p[,1])
+
 # Add counts of unique TFs
 TacoWild_uniqueTFs_by_module <- geneInfoTacoWild_merged_sig3 %>% group_by(moduleColors) %>% summarise(Unique_TFs = n_distinct(subjectSequenceID))
 TacoWild_corr_p_uniq <- merge(x = TacoWild_corr_p, y = TacoWild_uniqueTFs_by_module, by.x = "Module", by.y = "moduleColors", all.x = TRUE)
+
 # Replace any NAs in Unique_TFs column with 0s
 TacoWild_corr_p_uniq$Unique_TFs[is.na(TacoWild_corr_p_uniq$Unique_TFs)] <- 0
+
 # Order by correlation in descending order
 TacoWild_corr_p_uniq_desc <- TacoWild_corr_p_uniq[order(-TacoWild_corr_p_uniq$Correlation),]
+
 # Save as a CSV file
-write.csv(x = TacoWild_corr_p_uniq_desc, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/15_wild_taco_all_sig_modules_corr_pvalues_tfs.csv")
-
-#### No longer used below (was to only pull the most positively and most negatively correlated module)
-# # Pull out positively correlated TFs
-# # Subset merged data frame by columns
-# # Pull out most positively correlated with the Tacotalpa drainage
-# MM.PositiveWildTaco <- gsub("^", "MM.", modulePositiveWildTaco)
-# p.MM.PositiveWildTaco <- gsub("^", "p.MM.", modulePositiveWildTaco)
-
-# # select(data.frame, desired columns)
-# geneInfoTacoWild_merged_pos <- select(geneInfoTacoWild_merged, subjectSequenceID,geneID,gene.name,proteinAnnotations,moduleColors,MM.PositiveWildTaco,p.MM.PositiveWildTaco,target_gene,relationship,pubmed_interaction_IDs)
-# # Keep only rows with target genes (a way to get only the TFs)
-# geneInfoTacoWild_merged_pos2 <- geneInfoTacoWild_merged_pos[complete.cases(geneInfoTacoWild_merged_pos$target_gene),]
-# # Pull out TFs in the most positively correlated module with the Tacotalpa drainage
-# PositiveWildTaco_TF <- geneInfoTacoWild_merged_pos2[geneInfoTacoWild_merged_pos2$moduleColors == modulePositiveWildTaco,]
-# # Unique TFs
-# cat("\n")
-# cat("Unique TFs for PositiveWildTaco:\n")
-# unique(PositiveWildTaco_TF$subjectSequenceID)
-# cat("\n")
-# # Number of unique TFs
-# cat("\n")
-# cat("Number of unique TFs for PositiveWildTaco:\n")
-# length(unique(PositiveWildTaco_TF$subjectSequenceID))
-# # Save subset merged dataframe as a CSV file
-# 	# TFs are in the subjectSequenceID column
-# write.csv(x = PositiveWildTaco_TF, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/12_wild_taco_positive_corr_module_TFs.csv")
-# 
-# # Pull out negatively correlated TFs
-# # Subset merged data frame by columns
-# # Pull out most negatively correlated with the Tacotalpa drainage
-# MM.NegativeWildTaco <- gsub("^", "MM.", moduleNegativeWildTaco)
-# p.MM.NegativeWildTaco <- gsub("^", "p.MM.", moduleNegativeWildTaco)
-
-# # select(data.frame, desired columns)
-# geneInfoTacoWild_merged_neg <- select(geneInfoTacoWild_merged, subjectSequenceID,geneID,gene.name,proteinAnnotations,moduleColors,MM.NegativeWildTaco,p.MM.NegativeWildTaco,target_gene,relationship,pubmed_interaction_IDs)
-# # Keep only rows with target genes (a way to get only the TFs)
-# geneInfoTacoWild_merged_neg2 <- geneInfoTacoWild_merged_neg[complete.cases(geneInfoTacoWild_merged_neg$target_gene),]
-# # Pull out TFs in the most negatively correlated module with the Tacotalpa drainage
-# NegativeWildTaco_TF <- geneInfoTacoWild_merged_neg2[geneInfoTacoWild_merged_neg2$moduleColors == moduleNegativeWildTaco,]
-# # Unique TFs
-# cat("\n")
-# cat("Unique TFs for NegativeWildTaco:\n")
-# unique(NegativeWildTaco_TF$subjectSequenceID)
-# cat("\n")
-# # Number of unique TFs
-# cat("\n")
-# cat("Number of unique TFs for NegativeWildTaco:\n")
-# length(unique(NegativeWildTaco_TF$subjectSequenceID))
-# # Save subset merged dataframe as a CSV file
-# 	# TFs are in the subjectSequenceID column
-# write.csv(x = NegativeWildTaco_TF, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/12_wild_taco_negative_corr_module_TFs.csv")
+write.csv(x = TacoWild_corr_p_uniq_desc, file = "15_wild_taco_all_sig_modules_corr_pvalues_tfs.csv")
+```
