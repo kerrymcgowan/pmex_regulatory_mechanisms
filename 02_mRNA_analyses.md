@@ -1173,7 +1173,7 @@ mergedPichWild2 <- select(mergedPichWild, geneID,gene.name,subjectSequenceID,pro
 
 Save as a CSV file.
 ```{r}
-write.csv(mergedPichWild2, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/11_geneInfoPichWild_NAs_replaced_with_LOCs.csv")
+write.csv(mergedPichWild2, file = "11_geneInfoPichWild_NAs_replaced_with_LOCs.csv")
 ```
 
 ***Puyacatengo Drainage***<br>
@@ -1412,7 +1412,7 @@ cat("Number of unique TFs for WildPich from significant modules:\n")
 length(unique(geneInfoPichWild_merged_sig3$subjectSequenceID))
 
 # Save subset merged dataframe as a CSV file (TFs are in the subjectSequenceID column)
-write.csv(x = geneInfoPichWild_merged_sig3, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/14_wild_pich_all_sig_corr_modules_TFs.csv")
+write.csv(x = geneInfoPichWild_merged_sig3, file = "14_wild_pich_all_sig_corr_modules_TFs.csv")
 ```
 
 #### Make table of significant module correlations and p-values
@@ -1582,7 +1582,7 @@ write.csv(x = PuyaWild_corr_p_uniq_desc, file = "15_wild_puya_all_sig_modules_co
 ***Tacotalpa Drainage***<br>
 Load CSV file with module information generated via WGCNA.
 ```{r}
-geneInfoTacoWild <- read.csv("/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/11_geneInfoTacoWild_NAs_replaced_with_LOCs.csv")
+geneInfoTacoWild <- read.csv("11_geneInfoTacoWild_NAs_replaced_with_LOCs.csv")
 ```
 
 Pull out NCBI gene IDs from WGCNA dataset.
