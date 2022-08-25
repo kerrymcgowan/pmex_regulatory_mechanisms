@@ -1208,29 +1208,7 @@ Save as a CSV file.
 write.csv(mergedTacoWild2, file = "11_geneInfoTacoWild_NAs_replaced_with_LOCs.csv")
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #### Merge WGCNA output with TRRUST v2 human dataset to identify genes in significant modules that are transcription factors (TFs)
-
 Read in TRRUST v2 human dataset in TSV format (from https://www.grnpedia.org/trrust/downloadnetwork.php), downloaded 6/3/2020 (Release note (2018.04.16)).
 ```{r}
 trrust <- read.csv("trrust_rawdata.human.tsv", sep = "\t", header = FALSE)
@@ -1242,169 +1220,143 @@ colnames(trrust) <- c("transcription_factor", "target_gene", "relationship", "pu
 ```
 
 #### (1) Comparing ecotypes (sulfidic habitat to non-sulfidic habitat)
-
 Load CSV file with module information generated via WGCNA.
 ```{r}
-geneInfoHabitatWild <- read.csv("/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/11_geneInfoHabitatWild_NAs_replaced_with_LOCs.csv")
+geneInfoHabitatWild <- read.csv("11_geneInfoHabitatWild_NAs_replaced_with_LOCs.csv")
 ```
 
 Pull out NCBI gene IDs from WGCNA dataset.
 ```{r}
 # Split SubjectSequenceID by |
 geneInfoHabitatWild_split <- cSplit(geneInfoHabitatWild, 'subjectSequenceID', sep = "|", type.convert = FALSE)
-#colnames(geneInfoHabitatWild_split)
-#head(geneInfoHabitatWild_split)
+
 # Split SubjectSequenceID_3 by _
 geneInfoHabitatWild_split2 <- cSplit(geneInfoHabitatWild_split, 'subjectSequenceID_3', sep = "_", type.convert = FALSE)
-#colnames(geneInfoHabitatWild_split2)
-#head(geneInfoHabitatWild_split2)
-# Subset columns to keep subjectSequenceID_3_1 (the NCBI gene IDs)
 
-# select(data.frame, desired columns)
+# Subset columns to keep subjectSequenceID_3_1 (the NCBI gene IDs)
 geneInfoHabitatWild_subset <- select(geneInfoHabitatWild_split2, geneID,gene.name,subjectSequenceID_3_1,proteinAnnotations,moduleColors,GS.habitat_wild,p.GS.habitat_wild,matches("MM.*"),matches("p.MM.*"))
-#colnames(geneInfoHabitatWild_subset)
-#head(geneInfoHabitatWild_subset)
+
 # Rename subjectSequenceID_3_1
 colnames(geneInfoHabitatWild_subset)[3] <- "subjectSequenceID"
-#colnames(geneInfoHabitatWild_subset)
-# Merge WGCNA output and TRRUST dataframe, retain all lines in geneInfoHabitatWild_subset
-# allow.cartesian is allowed to have more than nrow(x)+nrow(i) rows because each TF has multiple rows in the TRRUST database, see https://jangorecki.gitlab.io/-/data.table/-/jobs/640724/artifacts/public/html/data.table.html
-geneInfoHabitatWild_merged <- merge(x = geneInfoHabitatWild_subset, y = trrust, by.x = "subjectSequenceID", by.y = "transcription_factor", all.x = TRUE, allow.cartesian = TRUE)
-#colnames(geneInfoHabitatWild_merged)
-#head(geneInfoHabitatWild_merged)
 ```
 
+Merge WGCNA output and TRRUST dataframe, retain all lines in geneInfoHabitatWild_subset.
+```{r}
+geneInfoHabitatWild_merged <- merge(x = geneInfoHabitatWild_subset, y = trrust, by.x = "subjectSequenceID", by.y = "transcription_factor", all.x = TRUE, allow.cartesian = TRUE)
+```
 
 #### Pull out TFs in modules significantly correlated to habitat
-
-# Pull out Pearson correlation p-values for all modules, rounded to 1 significant figure (to match 8_wild_correlations_and_p_values.pdf)
+```{r}
+# Pull out Pearson correlation p-values for all modules, rounded to 1 significant figure.
 moduleTraitPvalue_wild2 <- as.data.frame(signif(moduleTraitPvalue_wild, 1))
+
 # Sort by NS_vs_S_wild column in ascending order
 moduleTraitPvalue_wild2_asc_habitat <- moduleTraitPvalue_wild2[order(moduleTraitPvalue_wild2$NS_vs_S_wild),]
+
 # Print ordered modules
-cat("\n")
 cat("Habitat modules ordered by p-value:\n")
 moduleTraitPvalue_wild2_asc_habitat
-cat("\n")
+
 moduleTraitPvalue_wild2_asc_habitat <- tibble::rownames_to_column(moduleTraitPvalue_wild2_asc_habitat, "Module")
-colnames(moduleTraitPvalue_wild2_asc_habitat)
+
 # Pull out colors of modules with significant correlations (p < 0.05) to habitat
 moduleTraitPvalue_wild2_habitat_sig_only <- moduleTraitPvalue_wild2_asc_habitat[moduleTraitPvalue_wild2_asc_habitat$NS_vs_S_wild < 0.05,]
 sig_wild_habitat <- moduleTraitPvalue_wild2_habitat_sig_only$Module
-#sig_wild_habitat
+
 # Remove ME from string, left with only the name of the color
 sigModulesWildHabitat <- gsub("ME", "", sig_wild_habitat)
-#sigModulesWildHabitat
+
 # Pull out TFs from significantly correlated modules
 # Subset merged data frame by columns
 # Add prefixes to modules significantly correlated with habitat
 MM.sigModulesWildHabitat <- gsub("^", "MM.", sigModulesWildHabitat)
 p.MM.sigModulesWildHabitat <- gsub("^", "p.MM.", sigModulesWildHabitat)
+
 # Pull out only MM and p-values for significant columns
-# select(data.frame, desired columns)
 geneInfoHabitatWild_merged_sig <- select(geneInfoHabitatWild_merged, subjectSequenceID,geneID,gene.name,proteinAnnotations,moduleColors,all_of(MM.sigModulesWildHabitat),all_of(p.MM.sigModulesWildHabitat),target_gene,relationship,pubmed_interaction_IDs)
+
 # Subset to only the genes in significant modules using the column moduleColors
-# !! forces sigModulesWildHabitat to be read as a variable
-# %in% "keeps any of the following items"
 geneInfoHabitatWild_merged_sig2 <- geneInfoHabitatWild_merged_sig %>% filter(moduleColors %in% (!!sigModulesWildHabitat)) %>% group_by(moduleColors)
+
 # Keep only rows with target genes (a way to get only the TFs)
 geneInfoHabitatWild_merged_sig3 <- geneInfoHabitatWild_merged_sig2[complete.cases(geneInfoHabitatWild_merged_sig2$target_gene),]
+
 # Unique TFs
-cat("\n")
 cat("Unique TFs for WildHabitat from significant modules:\n")
 unique(geneInfoHabitatWild_merged_sig3$subjectSequenceID)
-cat("\n")
+
 # Number of unique TFs
-cat("\n")
 cat("Number of unique TFs for WildHabitat from significant modules:\n")
 length(unique(geneInfoHabitatWild_merged_sig3$subjectSequenceID))
-# Save subset merged dataframe as a CSV file
-	# TFs are in the subjectSequenceID column
-write.csv(x = geneInfoHabitatWild_merged_sig3, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/14_wild_habitat_all_sig_corr_modules_TFs.csv")
+
+# Save subset merged dataframe as a CSV file (TFs are in the subjectSequenceID column)
+write.csv(x = geneInfoHabitatWild_merged_sig3, file = "14_wild_habitat_all_sig_corr_modules_TFs.csv")
+```
 
 #### Make table of significant module correlations and p-values
-# Correlations
+Correlations.
+```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
 moduleTraitCor_wild2 <- tibble::rownames_to_column(moduleTraitCor_wild2, "Module")
-# !! forces sig_wild_habitat to be read as a variable
-# %in% "keeps any of the following items"
 HabitatWild_sig_corr <- moduleTraitCor_wild2 %>% filter(Module %in% (!!sig_wild_habitat))
+
 # Keep only modules and NS_vs_S_wild column
 HabitatWild_sig_corr2 <- HabitatWild_sig_corr[,c(1,2)]
-# p-values
+```
+
+p-values.
+```{r}
 moduleTraitPvalue_wild3 <- tibble::rownames_to_column(moduleTraitPvalue_wild2, "Module")
 # !! forces sig_wild_habitat to be read as a variable
 # %in% "keeps any of the following items"
 HabitatWild_sig_p <- moduleTraitPvalue_wild3 %>% filter(Module %in% (!!sig_wild_habitat))
 # Keep only modules and NS_vs_S_wild column
 HabitatWild_sig_p2 <- HabitatWild_sig_p[,c(1,2)]
-# Combine correlations and p-values
+```
+
+Combine correlations and p-values.
+```{r}
 HabitatWild_corr_p <- merge(x = HabitatWild_sig_corr2, y = HabitatWild_sig_p2, by.x = "Module", by.y = "Module", all = TRUE)
+
 # Rename columns
 names(HabitatWild_corr_p)[2] <- "Correlation"
 names(HabitatWild_corr_p)[3] <- "p-value"
+
 # Remove "ME" prefix in Module column
 HabitatWild_corr_p[,1] <- sub("ME", "", HabitatWild_corr_p[,1])
+
 # Add counts of unique TFs
 HabitatWild_uniqueTFs_by_module <- geneInfoHabitatWild_merged_sig3 %>% group_by(moduleColors) %>% summarise(Unique_TFs = n_distinct(subjectSequenceID))
 HabitatWild_corr_p_uniq <- merge(x = HabitatWild_corr_p, y = HabitatWild_uniqueTFs_by_module, by.x = "Module", by.y = "moduleColors", all.x = TRUE)
+
 # Replace any NAs in Unique_TFs column with 0s
 HabitatWild_corr_p_uniq$Unique_TFs[is.na(HabitatWild_corr_p_uniq$Unique_TFs)] <- 0
+
 # Order by correlation in descending order
 HabitatWild_corr_p_uniq_desc <- HabitatWild_corr_p_uniq[order(-HabitatWild_corr_p_uniq$Correlation),]
+
 # Save as a CSV file
-write.csv(x = HabitatWild_corr_p_uniq_desc, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/15_wild_habitat_all_sig_modules_corr_pvalues_tfs.csv")
+write.csv(x = HabitatWild_corr_p_uniq_desc, file = "15_wild_habitat_all_sig_modules_corr_pvalues_tfs.csv")
+```
 
-#### No longer used below (was to only pull the most positively and most negatively correlated module)
-# # Pull out positively correlated TFs
-# # Subset merged data frame by columns
-# # Pull out most positively correlated with habitat
-# MM.PositiveWildHabitat <- gsub("^", "MM.", modulePositiveWildHabitat)
-# p.MM.PositiveWildHabitat <- gsub("^", "p.MM.", modulePositiveWildHabitat)
 
-# # select(data.frame, desired columns)
-# geneInfoHabitatWild_merged_pos <- select(geneInfoHabitatWild_merged, subjectSequenceID,geneID,gene.name,proteinAnnotations,moduleColors,MM.PositiveWildHabitat,p.MM.PositiveWildHabitat,target_gene,relationship,pubmed_interaction_IDs)
-# # Keep only rows with target genes (a way to get only the TFs)
-# geneInfoHabitatWild_merged_pos2 <- geneInfoHabitatWild_merged_pos[complete.cases(geneInfoHabitatWild_merged_pos$target_gene),]
-# # Pull out TFs in the most positively correlated module with habitat
-# PositiveWildHabitat_TF <- geneInfoHabitatWild_merged_pos2[geneInfoHabitatWild_merged_pos2$moduleColors == modulePositiveWildHabitat,]
-# # Unique TFs
-# cat("\n")
-# cat("Unique TFs for PositiveWildHabitat:\n")
-# unique(PositiveWildHabitat_TF$subjectSequenceID)
-# cat("\n")
-# # Number of unique TFs
-# cat("\n")
-# cat("Number of unique TFs for PositiveWildHabitat:\n")
-# length(unique(PositiveWildHabitat_TF$subjectSequenceID))
-# # Save subset merged dataframe as a CSV file
-# 	# TFs are in the subjectSequenceID column
-# write.csv(x = PositiveWildHabitat_TF, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/12_wild_habitat_positive_corr_module_TFs.csv")
-# 
-# # Pull out negatively correlated TFs
-# # Subset merged data frame by columns
-# # Pull out most negatively correlated with habitat
-# MM.NegativeWildHabitat <- gsub("^", "MM.", moduleNegativeWildHabitat)
-# p.MM.NegativeWildHabitat <- gsub("^", "p.MM.", moduleNegativeWildHabitat)
 
-# # select(data.frame, desired columns)
-# geneInfoHabitatWild_merged_neg <- select(geneInfoHabitatWild_merged, subjectSequenceID,geneID,gene.name,proteinAnnotations,moduleColors,MM.NegativeWildHabitat,p.MM.NegativeWildHabitat,target_gene,relationship,pubmed_interaction_IDs)
-# # Keep only rows with target genes (a way to get only the TFs)
-# geneInfoHabitatWild_merged_neg2 <- geneInfoHabitatWild_merged_neg[complete.cases(geneInfoHabitatWild_merged_neg$target_gene),]
-# # Pull out TFs in the most negatively correlated module with habitat
-# NegativeWildHabitat_TF <- geneInfoHabitatWild_merged_neg2[geneInfoHabitatWild_merged_neg2$moduleColors == moduleNegativeWildHabitat,]
-# # Unique TFs
-# cat("\n")
-# cat("Unique TFs for NegativeWildHabitat:\n")
-# unique(NegativeWildHabitat_TF$subjectSequenceID)
-# cat("\n")
-# # Number of unique TFs
-# cat("\n")
-# cat("Number of unique TFs for NegativeWildHabitat:\n")
-# length(unique(NegativeWildHabitat_TF$subjectSequenceID))
-# # Save subset merged dataframe as a CSV file
-# 	# TFs are in the subjectSequenceID column
-# write.csv(x = NegativeWildHabitat_TF, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/12_wild_habitat_negative_corr_module_TFs.csv")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 cat(" ------------------------------------------------------------ Drainage Wild Output ------------------------------------------------------------ \n")
 
