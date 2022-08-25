@@ -7,7 +7,7 @@ Additional input files required for analyses are listed below.
 Used in `01_csRNA_analyses.md`.<br>
 [OXPHOS_Reference_and_Detox_Gene_IDS.csv](OXPHOS_Reference_and_Detox_Gene_IDS.csv)
 
-### Blast Annotations
+### Blast Results
 Used in `01_csRNA_analyses.md`.<br>
 [Table S2](https://pubmed.ncbi.nlm.nih.gov/28926156/) from Passow, C.N., Henpita, C., Shaw, J.H., Quackenbush, C.R., Warren, W.C., Schartl, M., Arias-Rodriguez, L., Kelley, J.L., Tobler, M. (2017) "The roles of plasticity and evolutionary change in shaping gene expression variation in natural populations of extremophile fish." *Mol Ecol* 26(22): 6384-6399.
 
