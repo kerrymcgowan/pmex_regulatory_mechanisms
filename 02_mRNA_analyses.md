@@ -550,7 +550,7 @@ moduleTraitCor_wild = cor(MEs_wild, datTraitsWild, use = "p")
 moduleTraitPvalue_wild = corPvalueStudent(moduleTraitCor_wild, nSamples_wild)
 ```
 
-#### Color code associations between modules and traits using their correlation values
+Color code associations between modules and traits using their correlation values.
 ```{r}
 pdf(file = "8_wild_correlations_and_p_values.pdf", width = 10, height = 16)
 sizeGrWindow(10,16)
@@ -575,6 +575,9 @@ dev.off()
 ```
 
 #### Gene relationship to trait and important modules: Gene Significance and Module Membership
+
+#### Comparing ecotypes (sulfidic habitat to non-sulfidic habitat)
+
 Define variable habitat_wild containing the NS_vs_S_wild column of datTraitsWild
 ```{r}
 habitat_wild = as.data.frame(datTraitsWild$NS_vs_S_wild)
@@ -682,27 +685,22 @@ dev.off()
 ```
 
 #### Summary output of network analysis results
-Return all gene IDs included in the analysis.
-```{r}
-names(datExprWild)
-```
-
 Import annotation file. See `Table S2` in the `README.md`.
 ```{r}
-annot = read.csv(file = "Table \S2")
+annot = read.csv(file = "Table\ S2")
 ```
 
+Calculate the number of genes without annotation--in this case, the number of genes without a BLAST hit in `Table S2`.
 ```{r}
 genesWild = names(datExprWild)
 genes2annotWild = match(genesWild, annot$geneID)
 
-# The following is the number of genes without annotation--in this case, the number of genes without a BLAST hit in `Table S2`
 cat("This is the number of genes without annotation:\n")
 sum(is.na(genes2annotWild))
 ```
 
-Create the starting data frame.
 ```{r}
+# Create the starting data frame.
 geneInfoHabitatWild0 = data.frame(geneID = genesWild,
 geneName = annot$geneName[genes2annotWild],
 subjectSequenceID = annot$SubjectSequenceID[genes2annotWild],
@@ -734,7 +732,7 @@ Write data frame into a text-format spreadsheet.
 write.csv(geneInfoHabitatWild, file = "10_geneInfoHabitatWild.csv")
 ```
 
-#### Replace NAs in 10_geneInfoHabitatWild.csv with their gene name/locus IDs from GFF file
+#### Replace NAs in 10_geneInfoHabitatWild.csv with their gene name/locus IDs from the *P. mexicana* GFF file
 NAs are from genes that do not have a BLAST hit.
 
 Read in annotations pulled from the *P. mexicana* GFF file. See `PmexGeneNameMatching.csv` in the `README.md`.
@@ -763,6 +761,24 @@ Save as a CSV file.
 ```{r}
 write.csv(mergedHabitatWild2, file = "11_geneInfoHabitatWild_NAs_replaced_with_LOCs.csv")
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### Comparing drainages (sulfidic habitat to non-sulfidic habitat)
 
 Pichucalco Drainage<br>
 Define variable pich_wild containing the Pich_vs_all_wild column of datTraitsWild.
@@ -971,7 +987,7 @@ cex.main = 1.2, cex.lab = 1.2, cex.axis = 1.2, col = moduleNegativeWildPuya)
 dev.off()
 ```
 
-Tacotalpa Drainage
+Tacotalpa Drainage<br>
 Most positively correlated module with Tacotalpa drainage.
 ```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
@@ -1042,59 +1058,10 @@ cex.main = 1.2, cex.lab = 1.2, cex.axis = 1.2, col = moduleNegativeWildTaco)
 dev.off()
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #### Summary output of network analysis results
 Return all gene IDs included in the analysis.
 ```{r}
 names(datExprWild)
-```
-
-Pichucalco Drainage<br>
-Return gene IDs belonging to each module.
-```{r}
-#cat("Wild: gene IDs in the module most positively correlated with the Pichucalco drainage:\n")
-#names(datExprWild)[moduleColors_wild==modulePositiveWildPich]
-#cat("\n")
-#cat("Wild: gene IDs in the module most negatively correlated with the Pichucalco drainage:\n")
-#names(datExprWild)[moduleColors_wild==moduleNegativeWildPich]
-#cat("\n")
-```
-
-**Puyacatengo**
-Return gene IDs belonging to each module.
-```{r}
-#cat("\n")
-#cat("Wild: gene IDs in the module most positively correlated with the Puyacatengo drainage:\n")
-#names(datExprWild)[moduleColors_wild==modulePositiveWildPuya]
-#cat("\n")
-#cat("Wild: gene IDs in the module most negatively correlated with the Puyacatengo drainage:\n")
-#names(datExprWild)[moduleColors_wild==moduleNegativeWildPuya]
-#cat("\n")
-```
-
-**Tacotalpa**
-Return gene IDs belonging to each module.
-```{r}
-#cat("\n")
-#cat("Wild: gene IDs in the module most positively correlated with the Tacotalpa drainage:\n")
-#names(datExprWild)[moduleColors_wild==modulePositiveWildTaco]
-#cat("\n")
-#cat("Wild: gene IDs in the module most negatively correlated with the Tacotalpa drainage:\n")
-#names(datExprWild)[moduleColors_wild==moduleNegativeWildTaco]
-#cat("\n")
 ```
 
 Import annotation file.
