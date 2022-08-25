@@ -1554,7 +1554,7 @@ PuyaWild_sig_p <- moduleTraitPvalue_wild3 %>% filter(Module %in% (!!sig_wild_puy
 PuyaWild_sig_p2 <- PuyaWild_sig_p[,c(1,4)]
 ```
 
-# Combine correlations and p-values
+Combine correlations and p-values.
 ```{r}
 PuyaWild_corr_p <- merge(x = PuyaWild_sig_corr2, y = PuyaWild_sig_p2, by.x = "Module", by.y = "Module", all = TRUE)
 
