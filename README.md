@@ -11,6 +11,6 @@ Used in `01_csRNA_analyses.md`.<br>
 Used in `01_csRNA_analyses.md`.<br>
 [Table S2](https://pubmed.ncbi.nlm.nih.gov/28926156/) from Passow, C.N., Henpita, C., Shaw, J.H., Quackenbush, C.R., Warren, W.C., Schartl, M., Arias-Rodriguez, L., Kelley, J.L., Tobler, M. (2017) "The roles of plasticity and evolutionary change in shaping gene expression variation in natural populations of extremophile fish." *Mol Ecol* 26(22): 6384-6399.
 
-### GFF Annotations
+### Annotations
 Used in `02_mRNA_analyses.md`.<br>
-[PmexGeneNameMatching.csv](PmexGeneNameMatching.csv)
+[PmexGeneNameMatching.csv](PmexGeneNameMatching.csv) pulled from the *Poecilia mexicana* GFF file.
