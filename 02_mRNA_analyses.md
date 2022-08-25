@@ -576,31 +576,24 @@ dev.off()
 
 #### Gene relationship to trait and important modules: Gene Significance and Module Membership
 
-#### Comparing ecotypes (sulfidic habitat to non-sulfidic habitat)
-
-Define variable habitat_wild containing the NS_vs_S_wild column of datTraitsWild
+#### (1) Comparing ecotypes (sulfidic habitat to non-sulfidic habitat)
 ```{r}
+# Define variable habitat_wild containing the NS_vs_S_wild column of datTraitsWild
 habitat_wild = as.data.frame(datTraitsWild$NS_vs_S_wild)
 names(habitat_wild) = "habitat_wild"
 
 # Names (colors) of the modules
 modNames_wild = substring(names(MEs_wild), 3)
-```
 
-```{r}
 geneModuleMembership_wild = as.data.frame(cor(datExprWild, MEs_wild, use = "p"))
 MMPvalue_wild = as.data.frame(corPvalueStudent(as.matrix(geneModuleMembership_wild), nSamples_wild))
-```
 
-```{r}
 names(geneModuleMembership_wild) = paste("MM", modNames_wild, sep="")
 names(MMPvalue_wild) = paste("p.MM", modNames_wild, sep="")
-```
-```{r}
+
 geneTraitSignificance_habitat_wild = as.data.frame(cor(datExprWild, habitat_wild, use = "p"))
 GSPvalue_habitat_wild = as.data.frame(corPvalueStudent(as.matrix(geneTraitSignificance_habitat_wild), nSamples_wild))
-```
-```{r}
+
 names(geneTraitSignificance_habitat_wild) = paste("GS.", names(habitat_wild), sep="")
 names(GSPvalue_habitat_wild) = paste("p.GS.", names(habitat_wild), sep="")
 ```
@@ -762,29 +755,13 @@ Save as a CSV file.
 write.csv(mergedHabitatWild2, file = "11_geneInfoHabitatWild_NAs_replaced_with_LOCs.csv")
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#### Comparing drainages (sulfidic habitat to non-sulfidic habitat)
-
-Pichucalco Drainage<br>
-Define variable pich_wild containing the Pich_vs_all_wild column of datTraitsWild.
+#### (2) Comparing drainages (Pichucalco, Puyacatengo, Tacotalpa)
+*Pichucalco Drainage*<br>
 ```{r}
+# Define variable pich_wild containing the Pich_vs_all_wild column of datTraitsWild
 pich_wild = as.data.frame(datTraitsWild$Pich_vs_all_wild)
 names(pich_wild) = "pich_wild"
+
 # Names (colors) of the modules
 modNames_wild = substring(names(MEs_wild), 3)
 
@@ -801,11 +778,12 @@ names(geneTraitSignificance_pich_wild) = paste("GS.", names(pich_wild), sep="")
 names(GSPvalue_pich_wild) = paste("p.GS.", names(pich_wild), sep="")
 ```
 
-Puyacatengo Drainage<br>
-Define variable puya_wild containing the Puya_vs_all_wild column of datTraitsWild.
+*Puyacatengo Drainage*<br>
 ```{r}
+# Define variable puya_wild containing the Puya_vs_all_wild column of datTraitsWild
 puya_wild = as.data.frame(datTraitsWild$Puya_vs_all_wild)
 names(puya_wild) = "puya_wild"
+
 # Names (colors) of the modules
 modNames_wild = substring(names(MEs_wild), 3)
 
@@ -822,9 +800,9 @@ names(geneTraitSignificance_puya_wild) = paste("GS.", names(puya_wild), sep="")
 names(GSPvalue_puya_wild) = paste("p.GS.", names(puya_wild), sep="")
 ```
 
-Tacotalpa Drainage<br>
-Define variable taco_wild containing the Taco_vs_all_wild column of datTraitsWild
+*Tacotalpa Drainage*<br>
 ```{r}
+# Define variable taco_wild containing the Taco_vs_all_wild column of datTraitsWild
 taco_wild = as.data.frame(datTraitsWild$Taco_vs_all_wild)
 names(taco_wild) = "taco_wild"
 # Names (colors) of the modules
@@ -846,7 +824,7 @@ names(GSPvalue_taco_wild) = paste("p.GS.", names(taco_wild), sep="")
 #### Intramodular analysis: identifying genes with high GS and MM
 Identify genes that have a high significance for drainage as well as high module membership in interesting modules.
 
-Pichucalco Drainage<br>
+*Pichucalco Drainage*<br>
 Most positively correlated module with Pichucalco drainage.
 ```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
@@ -869,7 +847,10 @@ modulePositiveWildPich <- gsub("ME", "", positive_wild_pich)
 
 columnPositiveWildPich = match(modulePositiveWildPich, modNames_wild)
 moduleGenesPositiveWildPich = moduleColors_wild==modulePositiveWildPich
+```
 
+Plot.
+```{r}
 pdf(file = "9_wild_pich_positive_corr_module.pdf", width = 7, height = 7)
 sizeGrWindow(7, 7)
 par(mfrow = c(1,1))
@@ -904,7 +885,10 @@ moduleNegativeWildPich <- gsub("ME", "", negative_wild_pich)
 
 columnNegativeWildPich = match(moduleNegativeWildPich, modNames_wild)
 moduleGenesNegativeWildPich = moduleColors_wild==moduleNegativeWildPich
+```
 
+Plot.
+```{r}
 pdf(file = "9_wild_pich_negative_corr_module.pdf", width = 7, height = 7)
 sizeGrWindow(7, 7)
 par(mfrow = c(1,1))
@@ -917,7 +901,7 @@ cex.main = 1.2, cex.lab = 1.2, cex.axis = 1.2, col = moduleNegativeWildPich)
 dev.off()
 ```
 
-Puyacatengo Drainage<br>
+*Puyacatengo Drainage*<br>
 Most positively correlated module with Puyacatengo drainage.
 ```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
@@ -940,7 +924,10 @@ modulePositiveWildPuya <- gsub("ME", "", positive_wild_puya)
 
 columnPositiveWildPuya = match(modulePositiveWildPuya, modNames_wild)
 moduleGenesPositiveWildPuya = moduleColors_wild==modulePositiveWildPuya
+```
 
+Plot.
+```{r}
 pdf(file = "9_wild_puya_positive_corr_module.pdf", width = 7, height = 7)
 sizeGrWindow(7, 7)
 par(mfrow = c(1,1))
@@ -974,8 +961,11 @@ moduleNegativeWildPuya <- gsub("ME", "", negative_wild_puya)
 #moduleNegativeWildPuya
 columnNegativeWildPuya = match(moduleNegativeWildPuya, modNames_wild)
 moduleGenesNegativeWildPuya = moduleColors_wild==moduleNegativeWildPuya
+```
 
-pdf(file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/9_wild_puya_negative_corr_module.pdf", width = 7, height = 7)
+Plot.
+```{r}
+pdf(file = "9_wild_puya_negative_corr_module.pdf", width = 7, height = 7)
 sizeGrWindow(7, 7)
 par(mfrow = c(1,1))
 verboseScatterplot(abs(geneModuleMembership_wild[moduleGenesNegativeWildPuya, columnNegativeWildPuya]),
@@ -987,7 +977,7 @@ cex.main = 1.2, cex.lab = 1.2, cex.axis = 1.2, col = moduleNegativeWildPuya)
 dev.off()
 ```
 
-Tacotalpa Drainage<br>
+*Tacotalpa Drainage*<br>
 Most positively correlated module with Tacotalpa drainage.
 ```{r}
 moduleTraitCor_wild2 <- as.data.frame(moduleTraitCor_wild)
@@ -1010,7 +1000,10 @@ modulePositiveWildTaco <- gsub("ME", "", positive_wild_taco)
 
 columnPositiveWildTaco = match(modulePositiveWildTaco, modNames_wild)
 moduleGenesPositiveWildTaco = moduleColors_wild==modulePositiveWildTaco
+```
 
+Plot.
+```{r}
 pdf(file = "9_wild_taco_positive_corr_module.pdf", width = 7, height = 7)
 sizeGrWindow(7, 7)
 par(mfrow = c(1,1))
@@ -1045,7 +1038,10 @@ moduleNegativeWildTaco <- gsub("ME", "", negative_wild_taco)
 
 columnNegativeWildTaco = match(moduleNegativeWildTaco, modNames_wild)
 moduleGenesNegativeWildTaco = moduleColors_wild==moduleNegativeWildTaco
+```
 
+Plot.
+```{r}
 pdf(file = "9_wild_taco_negative_corr_module.pdf", width = 7, height = 7)
 sizeGrWindow(7, 7)
 par(mfrow = c(1,1))
@@ -1059,38 +1055,9 @@ dev.off()
 ```
 
 #### Summary output of network analysis results
-Return all gene IDs included in the analysis.
+*Pichucalco Drainage*<br>
 ```{r}
-names(datExprWild)
-```
-
-Import annotation file.
-```{r}
-annot = read.csv(file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/scripts/annotations_from_cpassow.csv")
-cat("\n")
-cat("Dimensions of the annotation file:\n")
-dim(annot)
-cat("\n")
-cat("Names of the annotation file:\n")
-names(annot)
-cat("\n")
-genesWild = names(datExprWild)
-#cat("This is the vector genesWild:\n")
-#genesWild
-#cat("\n")
-genes2annotWild = match(genesWild, annot$geneID)
-# The following is the number of genes without annotation
-cat("This is the number of genes without annotation, should be 0:\n")
-sum(is.na(genes2annotWild))
-cat("\n")
-# Should return 0.
-# Mine doesn't I think because C Passow's annotation file contains more genes than genesWild
-	# Yes, confirmed with JLK, the annotation file only contains genes which have a BLAST hit, which is not all of the genes in genesWild
-```
-
-**Pichucalco**
-Create the starting data frame.
-```{r}
+# Create the starting data frame
 geneInfoPichWild0 = data.frame(geneID = genesWild,
 geneName = annot$geneName[genes2annotWild],
 subjectSequenceID = annot$SubjectSequenceID[genes2annotWild],
@@ -1098,8 +1065,10 @@ proteinAnnotations = annot$ProteinAnnotations[genes2annotWild],
 moduleColors = moduleColors_wild,
 geneTraitSignificance_pich_wild,
 GSPvalue_pich_wild)
+
 # Order modules by their significance for the Pichucalco drainage
 modOrder_pich_wild = order(-abs(cor(MEs_wild, pich_wild, use = "p")))
+
 # Add module membership information in the chosen order
 for (mod in 1:ncol(geneModuleMembership_wild))
 {
@@ -1109,6 +1078,7 @@ MMPvalue_wild[, modOrder_pich_wild[mod]])
 names(geneInfoPichWild0) = c(oldNames_pich_wild, paste("MM.", modNames_wild[modOrder_pich_wild[mod]], sep=""),
 paste("p.MM.", modNames_wild[modOrder_pich_wild[mod]], sep=""))
 }
+
 # Order the genes in the geneInfo variable first by module color, then by geneTraitSignificance
 geneOrder_pich_wild = order(geneInfoPichWild0$moduleColors, -abs(geneInfoPichWild0$GS.pich_wild))
 geneInfoPichWild = geneInfoPichWild0[geneOrder_pich_wild, ]
@@ -1116,12 +1086,12 @@ geneInfoPichWild = geneInfoPichWild0[geneOrder_pich_wild, ]
 
 Write data frame into a text-format spreadsheet.
 ```{r}
-write.csv(geneInfoPichWild, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/10_geneInfoPichWild.csv")
+write.csv(geneInfoPichWild, file = "10_geneInfoPichWild.csv")
 ```
 
-**Puyacatengo**
-Create the starting data frame.
+*Puyacatengo Drainage*<br>
 ```{r}
+# Create the starting data frame
 geneInfoPuyaWild0 = data.frame(geneID = genesWild,
 geneName = annot$geneName[genes2annotWild],
 subjectSequenceID = annot$SubjectSequenceID[genes2annotWild],
@@ -1129,8 +1099,10 @@ proteinAnnotations = annot$ProteinAnnotations[genes2annotWild],
 moduleColors = moduleColors_wild,
 geneTraitSignificance_puya_wild,
 GSPvalue_puya_wild)
+
 # Order modules by their significance for the Puyacatengo drainage
 modOrder_puya_wild = order(-abs(cor(MEs_wild, puya_wild, use = "p")))
+
 # Add module membership information in the chosen order
 for (mod in 1:ncol(geneModuleMembership_wild))
 {
@@ -1140,6 +1112,7 @@ MMPvalue_wild[, modOrder_puya_wild[mod]])
 names(geneInfoPuyaWild0) = c(oldNames_puya_wild, paste("MM.", modNames_wild[modOrder_puya_wild[mod]], sep=""),
 paste("p.MM.", modNames_wild[modOrder_puya_wild[mod]], sep=""))
 }
+
 # Order the genes in the geneInfo variable first by module color, then by geneTraitSignificance
 geneOrder_puya_wild = order(geneInfoPuyaWild0$moduleColors, -abs(geneInfoPuyaWild0$GS.puya_wild))
 geneInfoPuyaWild = geneInfoPuyaWild0[geneOrder_puya_wild, ]
@@ -1147,12 +1120,12 @@ geneInfoPuyaWild = geneInfoPuyaWild0[geneOrder_puya_wild, ]
 
 Write data frame into a text-format spreadsheet.
 ```{r}
-write.csv(geneInfoPuyaWild, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/10_geneInfoPuyaWild.csv")
+write.csv(geneInfoPuyaWild, file = "10_geneInfoPuyaWild.csv")
 ```
 
-**Tacotalpa**
-Create the starting data frame.
+*Tacotalpa Drainage*<br>
 ```{r}
+# Create the starting data frame
 geneInfoTacoWild0 = data.frame(geneID = genesWild,
 geneName = annot$geneName[genes2annotWild],
 subjectSequenceID = annot$SubjectSequenceID[genes2annotWild],
@@ -1160,8 +1133,10 @@ proteinAnnotations = annot$ProteinAnnotations[genes2annotWild],
 moduleColors = moduleColors_wild,
 geneTraitSignificance_taco_wild,
 GSPvalue_taco_wild)
+
 # Order modules by their significance for the Tacotalpa drainage
 modOrder_taco_wild = order(-abs(cor(MEs_wild, taco_wild, use = "p")))
+
 # Add module membership information in the chosen order
 for (mod in 1:ncol(geneModuleMembership_wild))
 {
@@ -1171,6 +1146,7 @@ MMPvalue_wild[, modOrder_taco_wild[mod]])
 names(geneInfoTacoWild0) = c(oldNames_taco_wild, paste("MM.", modNames_wild[modOrder_taco_wild[mod]], sep=""),
 paste("p.MM.", modNames_wild[modOrder_taco_wild[mod]], sep=""))
 }
+
 # Order the genes in the geneInfo variable first by module color, then by geneTraitSignificance
 geneOrder_taco_wild = order(geneInfoTacoWild0$moduleColors, -abs(geneInfoTacoWild0$GS.taco_wild))
 geneInfoTacoWild = geneInfoTacoWild0[geneOrder_taco_wild, ]
@@ -1178,77 +1154,63 @@ geneInfoTacoWild = geneInfoTacoWild0[geneOrder_taco_wild, ]
 
 Write data frame into a text-format spreadsheet.
 ```{r}
-write.csv(geneInfoTacoWild, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/10_geneInfoTacoWild.csv")
+write.csv(geneInfoTacoWild, file = "10_geneInfoTacoWild.csv")
 ```
-#### Replace NAs in 10_geneInfo*Wild.csv with gene.names (LOC IDs) from PmexGeneNameMatching.csv from C Passow -----------------------------------------------------------------------------------------------------------------
-	# NAs are genes that do not have a BLAST hit
 
-# Read in annotations from GFF from C Passow
-PmexGeneNameMatching <- read.csv(file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/scripts/PmexGeneNameMatching.csv")
+#### Replace NAs in 10_geneInfo\*Wild.csv with their gene name/locus IDs from the P. mexicana GFF file
+NAs are genes that do not have a BLAST hit.
 
-# Make row 1 the headers for the columns
-names(PmexGeneNameMatching) <- as.matrix(PmexGeneNameMatching[1, ])
-PmexGeneNameMatching <- PmexGeneNameMatching[-1, ]
-PmexGeneNameMatching[] <- lapply(PmexGeneNameMatching, function(x) type.convert(as.character(x)))
-cat("\n")
-cat("Beginning of PmexGeneNameMatching:\n")
-head(PmexGeneNameMatching)
-cat("\n")
-
-# Pichucalco
-# Merge PmexGeneNameMatching and geneInfoPichWild by gene ID
+*Pichucalco Drainage*<br>
+Merge `PmexGeneNameMatching` and `geneInfoPichWild` by gene ID.
+```{r}
 mergedPichWild <- merge(x = geneInfoPichWild, y = PmexGeneNameMatching, by.x = "geneID", by.y = "gene.ID", all.x = TRUE)
-cat("\n")
-cat("Column names of mergedPichWild:\n")
-colnames(mergedPichWild)
-cat("\n")
-#head(mergedPichWild)
-# Select columns in a new order to replace NAs in the geneName column of mergedPichWild with gene.name
-# select(data.frame, desired columns)
+```
+
+Select columns in a new order to replace NAs in the geneName column of mergedPichWild with gene.name.
+```{r}
 mergedPichWild2 <- select(mergedPichWild, geneID,gene.name,subjectSequenceID,proteinAnnotations,moduleColors,GS.pich_wild,p.GS.pich_wild,matches("MM.*"),matches("p.MM.*"))
-cat("\n")
-cat("Column names of mergedPichWild2 (selected columns):\n")
-colnames(mergedPichWild2)
-cat("\n")
-# Save as a CSV file
+```
+
+Save as a CSV file.
+```{r}
 write.csv(mergedPichWild2, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/11_geneInfoPichWild_NAs_replaced_with_LOCs.csv")
+```
 
-# Puyacatengo
-# Merge PmexGeneNameMatching and geneInfoPuyaWild by gene ID
+*Puyacatengo Drainage*<br>
+Merge `PmexGeneNameMatching` and `geneInfoPuyaWild` by gene ID.
+```{r}
 mergedPuyaWild <- merge(x = geneInfoPuyaWild, y = PmexGeneNameMatching, by.x = "geneID", by.y = "gene.ID", all.x = TRUE)
-cat("\n")
-cat("Column names of mergedPuyaWild:\n")
-colnames(mergedPuyaWild)
-cat("\n")
-#head(mergedPuyaWild)
-# Select columns in a new order to replace NAs in the geneName column of mergedPuyaWild with gene.name
-# select(data.frame, desired columns)
+```
+
+Select columns in a new order to replace NAs in the geneName column of mergedPuyaWild with gene.name.
+```{r}
 mergedPuyaWild2 <- select(mergedPuyaWild, geneID,gene.name,subjectSequenceID,proteinAnnotations,moduleColors,GS.puya_wild,p.GS.puya_wild,matches("MM.*"),matches("p.MM.*"))
-cat("\n")
-cat("Column names of mergedPuyaWild2 (selected columns):\n")
-colnames(mergedPuyaWild2)
-cat("\n")
-# Save as a CSV file
-write.csv(mergedPuyaWild2, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/11_geneInfoPuyaWild_NAs_replaced_with_LOCs.csv")
+```
 
-# Tacotalpa
-# Merge PmexGeneNameMatching and geneInfoTacoWild by gene ID
+Save as a CSV file.
+```{r}
+write.csv(mergedPuyaWild2, file = "11_geneInfoPuyaWild_NAs_replaced_with_LOCs.csv")
+```
+
+*Tacotalpa Drainage*<br>
+Merge `PmexGeneNameMatching` and `geneInfoTacoWild` by gene ID.
+```{r}
 mergedTacoWild <- merge(x = geneInfoTacoWild, y = PmexGeneNameMatching, by.x = "geneID", by.y = "gene.ID", all.x = TRUE)
-cat("\n")
-cat("Column names of mergedTacoWild:\n")
-colnames(mergedTacoWild)
-cat("\n")
-#head(mergedTacoWild)
-# Select columns in a new order to replace NAs in the geneName column of mergedTacoWild with gene.name
+```
 
-# select(data.frame, desired columns)
+Select columns in a new order to replace NAs in the geneName column of mergedTacoWild with gene.name.
+```{r}
 mergedTacoWild2 <- select(mergedTacoWild, geneID,gene.name,subjectSequenceID,proteinAnnotations,moduleColors,GS.taco_wild,p.GS.taco_wild,matches("MM.*"),matches("p.MM.*"))
-cat("\n")
-cat("Column names of mergedTacoWild2 (selected columns):\n")
-colnames(mergedTacoWild2)
-cat("\n")
-# Save as a CSV file
-write.csv(mergedTacoWild2, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/11_geneInfoTacoWild_NAs_replaced_with_LOCs.csv")
+```
+
+Save as a CSV file.
+```{r}
+write.csv(mergedTacoWild2, file = "11_geneInfoTacoWild_NAs_replaced_with_LOCs.csv")
+```
+
+
+
+
 
 
 
@@ -1269,20 +1231,26 @@ write.csv(mergedTacoWild2, file = "/data/kelley/projects/kerry/pmex_tf_biomed/7_
 
 #### Merge WGCNA output with TRRUST v2 human dataset to identify genes in significant modules that are transcription factors (TFs)
 
-# Read in TRRUST v2 human dataset in TSV format (from https://www.grnpedia.org/trrust/downloadnetwork.php), downloaded 6/3/2020 (Release note (2018.04.16))
-trrust <- read.csv("/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/scripts/trrust_rawdata.human.tsv", sep = "\t", header = FALSE)
+Read in TRRUST v2 human dataset in TSV format (from https://www.grnpedia.org/trrust/downloadnetwork.php), downloaded 6/3/2020 (Release note (2018.04.16)).
+```{r}
+trrust <- read.csv("trrust_rawdata.human.tsv", sep = "\t", header = FALSE)
+```
 
-# Add column names
+Add column names.
+```{r}
 colnames(trrust) <- c("transcription_factor", "target_gene", "relationship", "pubmed_interaction_IDs")
+```
 
-cat(" ------------------------------------------------------------ Habitat (NS vs S) Wild Output ------------------------------------------------------------ \n")
+#### (1) Comparing ecotypes (sulfidic habitat to non-sulfidic habitat)
 
-# Load CSV file with module information generated via WGCNA
+Load CSV file with module information generated via WGCNA.
+```{r}
 geneInfoHabitatWild <- read.csv("/data/kelley/projects/kerry/pmex_tf_biomed/7_edgeR_WGCNA/11_geneInfoHabitatWild_NAs_replaced_with_LOCs.csv")
+```
 
-#### Pull out NCBI gene IDs from WGCNA dataset
+Pull out NCBI gene IDs from WGCNA dataset.
+```{r}
 # Split SubjectSequenceID by |
-
 geneInfoHabitatWild_split <- cSplit(geneInfoHabitatWild, 'subjectSequenceID', sep = "|", type.convert = FALSE)
 #colnames(geneInfoHabitatWild_split)
 #head(geneInfoHabitatWild_split)
@@ -1304,6 +1272,8 @@ colnames(geneInfoHabitatWild_subset)[3] <- "subjectSequenceID"
 geneInfoHabitatWild_merged <- merge(x = geneInfoHabitatWild_subset, y = trrust, by.x = "subjectSequenceID", by.y = "transcription_factor", all.x = TRUE, allow.cartesian = TRUE)
 #colnames(geneInfoHabitatWild_merged)
 #head(geneInfoHabitatWild_merged)
+```
+
 
 #### Pull out TFs in modules significantly correlated to habitat
 
