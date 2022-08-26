@@ -459,7 +459,7 @@ findMotifsGenome.pl \
 
 Foreground.
 ```{r}
-# 03_DI_sig_DE_sig_upreg.csv has already been filtered above to include only significantly upregulated peaks/genes in sulfidic populations compared to non-sulfidic populations (FDR < 0.05 and +logFC for both RNA-seq and csRNA-seq)
+# The input file 03_DI_sig_DE_sig_upreg.csv has already been filtered above to include only significantly upregulated peaks/genes in sulfidic populations compared to non-sulfidic populations (FDR < 0.05 and +logFC for both RNA-seq and csRNA-seq)
 # Grab column 3 (csRNA_peakID), remove header row, sort, remove quotation marks
 awk 'BEGIN {FS = ","} ; {print $3}' 03_DI_sig_DE_sig_upreg.csv | awk 'NR > 1' | sort | sed -e 's/^"//' -e 's/"$//' > foreground_pos_logFC_both_DE_and_DI_peak_names_only.txt
 
