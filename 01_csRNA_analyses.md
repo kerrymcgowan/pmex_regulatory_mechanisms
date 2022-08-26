@@ -131,7 +131,7 @@ getDiffExpression.pl \
 	> ns_vs_s_diffOutput_edgeR.txt
 ```
 
-Subsequent analyses in this section were run in RStudio (v.2022.02.1) using R (v.4.0.3).
+Subsequent analyses in this section were run using R (v.4.0.3).
 
 Install required packages.
 ```{r, message=FALSE, eval=FALSE}
