@@ -506,7 +506,7 @@ seqtk subseq target.fa background_peaks_names_only_per4.txt > background_per4.fa
 seqtk subseq target.fa background_peaks_names_only_per5.txt > background_per5.fa
 ```
 
-CiiiDER was then run using a GUI and plotted in R below.<br>
+CiiiDER was then run using the GUI with `foreground_pos_logFC_both_DE_and_DI.fa` as the foreground and `background_per*.fa` as the different backgrounds. The results for permutation 1 are plotted in R below.<br>
 <br>
 Read in data.
 ```{r}
