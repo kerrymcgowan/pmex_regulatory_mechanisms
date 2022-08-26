@@ -132,9 +132,6 @@ getDiffExpression.pl \
 ```
 
 Subsequent analyses in this section were run in RStudio (v.2022.02.1) using R (v.4.0.3).
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 Install required packages.
 ```{r, message=FALSE, eval=FALSE}
