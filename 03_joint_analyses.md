@@ -1,4 +1,4 @@
-Analyses in this section were run using R (v.4.0.3).
+Analyses in this section were run using R (v.4.0.3) unless otherwise indicated.
 
 Install packages.
 ```{r}
@@ -445,8 +445,87 @@ write.csv(x = alluvial_df, file = "03_alluvial_nodes_and_edges.csv", row.names =
 ```
 
 ### CiiiDER Transcription Factor Binding Site (TFBS) Enrichment Analysis
-CiiiDER was run using a GUI then plotted here. The foreground for this analysis was regions -150, +50 bp around the start site of transcription initation from significantly *upregulated* DI peaks with significantly *upregulated* DE genes.
+Pull FASTA sequences in the core promoter regions (-150, +50 bp) of all genes. The input `merged.tss.txt` is from `01_csRNA_analyses.md`. This generates a file `target.fa` in `20_homer_findmotifsgenome_dumpfasta_DE_and_DI_intersection/` that is then subset into 1 foreground and 5 background permutations to input into the CiiiDER GUI.<br>
+<br>
+Run using HOMER Tools (v.4.11) and Seqtk (v.1.3) in bash. 
+```{bash}
+findMotifsGenome.pl \
+	merged.tss.txt \
+	GCF_001443325.1_P_mexicana-1.0_genomic.fna \
+	20_homer_findmotifsgenome_dumpfasta_DE_and_DI_intersection \
+	-size -150,50 \
+	-dumpFasta
+```
 
+Foreground.
+```{r}
+# These data frames have already been filtered to include only significant peaks/genes (FDR < 0.05 for both RNA-seq and csRNA-seq)
+# Grab column 3 (csRNA_peakID), remove header row, sort, remove quotation marks
+# Both DE and DI upregulated in sulfidic populations
+awk 'BEGIN {FS = ","} ; {print $3}' 03_DI_sig_DE_sig_upreg.csv | awk 'NR > 1' | sort | sed -e 's/^"//' -e 's/"$//' > foreground_pos_logFC_both_DE_and_DI_peak_names_only.txt
+
+# Intersect above with target.fa from findMotifsGenome.pl -dumpFasta
+# NOTE: findMotifsGenome.pl -dumpFasta removed 70 of 66,537 peaks because they had >70.00% Ns (i.e. masked repeats), so not all peaks in merged.tss.txt are in target.fa
+
+# Both DE and DI upregulated in sulfidic populations
+seqtk subseq target.fa foreground_pos_logFC_both_DE_and_DI_peak_names_only.txt > foreground_pos_logFC_both_DE_and_DI.fa
+```
+
+Background permutations.
+```{r}
+# Pull Merged IDs of all not significantly differentially initiated peaks (FDR > 0.05) with logFC < abs(0.5)
+awk 'BEGIN {FS = "\t"} ; {if($34 > 0.05 && $32 < 0.5 && $32 > -0.5) print $0}' ns_vs_s_diffOutput_edgeR.txt > background_peaks.txt
+
+# Count the number of non-significant peaks going into background 
+wc -l background_peaks.txt
+
+# Generate permutations of background_peaks.txt by randomly sampling 2,000 sequences each time
+# This was done in large part because CiiiDER GUI can't handle 30,001 peaks well as the background (too large)
+shuf -n 2000 background_peaks.txt > background_peaks_per1.txt
+shuf -n 2000 background_peaks.txt > background_peaks_per2.txt
+shuf -n 2000 background_peaks.txt > background_peaks_per3.txt
+shuf -n 2000 background_peaks.txt > background_peaks_per4.txt
+shuf -n 2000 background_peaks.txt > background_peaks_per5.txt
+
+# Grab column 1 of merged peak names
+# All peaks
+awk '{print $1}' background_peaks.txt | sort > background_peaks_names_only.txt
+# Permutations
+awk '{print $1}' background_peaks_per1.txt | sort > background_peaks_names_only_per1.txt
+awk '{print $1}' background_peaks_per2.txt | sort > background_peaks_names_only_per2.txt
+awk '{print $1}' background_peaks_per3.txt | sort > background_peaks_names_only_per3.txt
+awk '{print $1}' background_peaks_per4.txt | sort > background_peaks_names_only_per4.txt
+awk '{print $1}' background_peaks_per5.txt | sort > background_peaks_names_only_per5.txt
+
+# Intersect EdgeR output with target.fa from findMotifsGenome.pl -dumpFasta
+# NOTE: findMotifsGenome.pl -dumpFasta removed 70 of 66,537 peaks because they had >70.00% Ns (i.e. masked repeats), so not all peaks in merged.tss.txt are in target.fa
+# All peaks
+seqtk subseq target.fa background_peaks_names_only.txt > background.fa
+# Permutations
+seqtk subseq target.fa background_peaks_names_only_per1.txt > background_per1.fa
+seqtk subseq target.fa background_peaks_names_only_per2.txt > background_per2.fa
+seqtk subseq target.fa background_peaks_names_only_per3.txt > background_per3.fa
+seqtk subseq target.fa background_peaks_names_only_per4.txt > background_per4.fa
+seqtk subseq target.fa background_peaks_names_only_per5.txt > background_per5.fa
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CiiiDER was then run using a GUI and plotted in R below.<br>
+<br>
 Read in data.
 ```{r}
 data <- read.csv(file = "Enrichment: background_per1_MostSigDeficit.csv")
