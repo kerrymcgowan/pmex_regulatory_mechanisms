@@ -1,11 +1,11 @@
-### Intersect Differentially Initiated Transcripts and Differentially Expressed Genes
-Subsequent analyses in this section were run using R (v.4.0.3).
+Analyses in this section were run using R (v.4.0.3).
 
 Install packages.
 ```{r}
 install.packages("DescTools")
-install.packages("ggrepel")
+install.packages("ggforce")
 install.packages("ggpubr")
+install.packages("ggrepel")
 install.packages("mblm")
 install.packages("RColorBrewer")
 install.packages("tidyverse")
@@ -15,16 +15,19 @@ install.packages("viridis")
 Load packages.
 ```{r}
 library(DescTools)
-library(ggrepel)
+library(ggforce)
 library(ggpubr)
+library(ggrepel)
 library(mblm)
 library(RColorBrewer)
 library(tidyverse)
 library(viridis)
 ```
 
+### Intersect Differentially Initiated Transcripts and Differentially Expressed Genes
+
 #### Differentially Initiated (DI) peaks from csRNA-seq
-Read in DI peaks (csRNA-seq) analyzed using edgeR.
+Read in DI peaks (csRNA-seq) analyzed using edgeR (see 01_csRNA_analyses.md).
 ```{r}
 DI <- read.delim("ns_vs_s_diffOutput_edgeR.txt", sep = "\t")
 
@@ -215,7 +218,7 @@ GTest(x = observed_DI_sig_DE_nomatch,
       correct = "none")
 ```
 
-Generate a stacked bar chart of genomic locations. Colorblind friendly palette from: (https://stackoverflow.com/questions/57153428/r-plot-color-combinations-that-are-colorblind-accessible).
+Generate a stacked bar chart of genomic locations (using a colorblind friendly palette).
 ```{r}
 # Combine data frames
 gen_loc_w_percents <- rbind(DI_sig_DE_sig_gen_loc_w_percents, DI_sig_DE_nonsig_gen_loc_w_percents, DI_sig_DE_nomatch_gen_loc_w_percents)
@@ -241,7 +244,6 @@ ggsave(file = "02_genomic_locations_stacked_bar_DE_or_not.pdf", stacked_bar, wid
 ```
 
 #### Subset significantly DI peaks with significantly DE genes by the directionality of their log2-fold change (logFC)
-
 Both DI and DE upregulated (+logFC) in sulfidic populations.
 ```{r}
 DI_sig_DE_sig_upreg <- subset(x = DI_sig_DE_sig, `csRNA_LogFC` > 0 & `RNA_LogFC` > 0)
@@ -387,7 +389,7 @@ GTest(x = observed_DI_sig_DE_sig_divergent,
       correct = "none")
 ```
 
-Generate a stacked bar chart of genomic locations using a colorblind friendly palette.
+Generate a stacked bar chart of genomic locations (using a colorblind friendly palette).
 ```{r}
 # Combine data frames
 gen_loc_w_percents2 <- rbind(DI_sig_DE_sig_upreg_gen_loc_w_percents, DI_sig_DE_sig_downreg_gen_loc_w_percents, DI_sig_DE_sig_divergent_gen_loc_w_percents)
@@ -410,7 +412,7 @@ stacked_bar2
 
 ggsave(file = "02_genomic_locations_stacked_bar_upreg_downreg_div.pdf", stacked_bar2, width = 9, height = 5)
 ```
-
+#### Nodes and edges used to make an alluvial plot (below)
 Nodes and edges for significant DI but not significant DE.
 ```{r}
 # Add additional columns
@@ -429,8 +431,7 @@ DI_sig_DE_nomatch_gen_loc2$Direction <- "4_None"
 DI_sig_DE_nomatch_gen_loc2
 ```
 
-#### Combine nodes and edges to make an alluvial plot (below)
-
+Combine nodes and edges into a data frame that can be used to generate the alluvial plot.
 ```{r}
 # Bind nodes and edges
 alluvial_df <- rbind(DI_sig_DE_sig_upreg_gen_loc, DI_sig_DE_sig_downreg_gen_loc, DI_sig_DE_sig_divergent_gen_loc, DI_sig_DE_nonsig_gen_loc2, DI_sig_DE_nomatch_gen_loc2)
@@ -444,9 +445,56 @@ write.csv(x = alluvial_df, file = "03_alluvial_nodes_and_edges.csv", row.names =
 ```
 
 ### CiiiDER Transcription Factor Binding Site (TFBS) Enrichment Analysis
-Subsequent analyses in this section were run using R (v.4.0.3).<br>
+CiiiDER was run using a GUI then plotted here. The foreground for this analysis was regions -150, +50 bp around the start site of transcription initation from significantly *upregulated* DI peaks with significantly *upregulated* DE genes.
 
-CiiiDER was run using a GUI. Read in CiiiDER analysis (permutation 1). The foreground for this analysis were regions -150, +50 bp around the TSS from significantly *upregulated* DI peaks with significantly *upregulated* DE genes.
+Read in data.
+```{r}
+data <- read.csv(file = "Enrichment: background_per1_MostSigDeficit.csv")
+```
+
+Separate into significant (Gene.P.Value < 0.05) and non-significant (Gene.P.Value > 0.05) data frames for plotting.
+```{r}
+data_sig <- subset(x = data, subset = `Gene.P.Value` < 0.05)
+data_nonsig <- subset(x = data, subset = `Gene.P.Value` > 0.05)
+```
+
+Sort by Gene.P.Value and Significance.Score. Note, they order the genes the same way!
+```{r}
+# Significant
+sorted_genePValue_sig <- data_sig[order(data_sig$`Gene.P.Value`),]
+
+# Sorted by absolute value
+sorted_SigScore_sig <- data_sig[order(-abs(data_sig$`Significance.Score`)),]
+
+# Non-significant
+sorted_genePValue_nonsig <- data_nonsig[order(data_nonsig$`Gene.P.Value`),]
+
+# Sorted by absolute value
+sorted_SigScore_nonsig <- data_nonsig[order(-abs(data_nonsig$`Significance.Score`)),]
+```
+
+Plot the enrichment analysis. Non-significant points (in gray) are added in separately from significant points.
+```{r}
+# Plot with labels for top 30 most significant TF binding motifs
+enrichment_analysis_foreground_background_per1_deficitMostSig_200bpRegion_top30_with_legend <- ggplot(data = data_nonsig, aes(x = Average.Log2.Proportion.Bound, y = Log2.Enrichment)) +
+  # Significant values
+  geom_point(aes(size = abs(Significance.Score)), alpha = 0.6, color = "grey80") + 
+  # Non-significant values
+  geom_point(data = data_sig, 
+             aes(size = abs(Significance.Score), color = Significance.Score), alpha = 0.7) +
+  scale_size_continuous(range = c(0, 4)) +
+  scale_color_gradient2(low = "steelblue3", mid = "khaki1", high = "red3", midpoint = 0) +
+  labs(y=expression('Average Log'[2]*' Enrichment'), x=expression('Average Log'[2]*' Proportion Bound')) +
+  geom_hline(aes(yintercept = 0), color = "grey80") +
+  geom_text_repel(data = sorted_genePValue_sig[1:30,], aes(label = Transcription.Factor.Name), max.overlaps = Inf, cex = 2.5, min.segment.length = 0) +
+   theme_classic()
+enrichment_analysis_foreground_background_per1_deficitMostSig_200bpRegion_top30_with_legend
+ggsave(filename = "01_enrichment_analysis_foreground_background_per1_deficitMostSig_200bpRegion_top30_with_legend.pdf",
+       plot = enrichment_analysis_foreground_background_per1_deficitMostSig_200bpRegion_top30_with_legend)
+```
+
+### CiiiDER and WGCNA Intersection
+CiiiDER results from GUI (same file as previous section).
 ```{r}
 ciiider_upreg <- read.csv(file = "Enrichment: background_per1_MostSigDeficit.csv")
 ```
@@ -476,9 +524,6 @@ ciiider_upreg_sig_zero_enrich <- subset(x = ciiider_upreg_sig, `Log2.Enrichment`
 ciiider_upreg_sig_neg_enrich <- subset(x = ciiider_upreg_sig, `Log2.Enrichment` < 0)
 ```
 
-#### Intersect CiiiDER results with WGCNA results
-
-CiiiDER results.
 ```{r}
 # Remove (var.#) at the end of some TFs and capitalize all
 ciiider_upreg_sig_pos_enrich$Transcription.Factor.Simple <- toupper(gsub("\\(.*", "", ciiider_upreg_sig_pos_enrich$Transcription.Factor.Name))
@@ -487,9 +532,9 @@ ciiider_upreg_sig_pos_enrich$Transcription.Factor.Simple <- toupper(gsub("\\(.*"
 ciiider_upreg_sig_pos_enrich_split <- separate_rows(ciiider_upreg_sig_pos_enrich, Transcription.Factor.Simple, sep = '::')
 ```
 
-Read in WGCNA.
+WGCNA results (from 02_mRNA_analyses.md).
 ```{r}
-wgcna <- read.csv(file = '~/Documents/WSU/RESEARCH/pmex_tf_biomed/7_edgeR_WGCNA/11_geneInfoHabitatWild_NAs_replaced_with_LOCs.csv')
+wgcna <- read.csv(file = '11_geneInfoHabitatWild_NAs_replaced_with_LOCs.csv')
 
 # Split SubjectSequenceID column to only include the gene name.
 wgcna_split <- wgcna %>% 
@@ -516,17 +561,24 @@ wgcna_split_MM_pval <- transform(wgcna_split_MM_pval,
 wgcna_split_MM_pval_sig <- subset(x = wgcna_split_MM_pval, subset = `P_VALUE` < 0.05)
 ```
 
-Merge CiiiDER results and WGCNA.
+Merge CiiiDER and WGCNA results.
 ```{r}
 ciiider_upreg_wgcna <- merge(x = ciiider_upreg_sig_pos_enrich_split, y = wgcna_split_MM_pval_sig, by.x = "Transcription.Factor.Simple", by.y = "subjectSequenceID", all = FALSE)
 ```
 
-Plot a histogram of WGCNA module membership to see distribution.
+Linear regressions.
 ```{r}
-ggplot(data = ciiider_upreg_wgcna, aes(MODULE_MEMBERSHIP)) +
-  geom_histogram()
+lm_sig_pos_corr_wgcna <- lm(data = subset(ciiider_upreg_wgcna, significance == "sig_pos_corr"), MODULE_MEMBERSHIP ~ Log2.Enrichment)
+summary(lm_sig_pos_corr_wgcna)
 ```
-
+```{r}
+lm_sig_neg_corr_wgcna <- lm(data = subset(ciiider_upreg_wgcna, significance == "sig_neg_corr"), MODULE_MEMBERSHIP ~ Log2.Enrichment)
+summary(lm_sig_neg_corr_wgcna)
+```
+```{r}
+lm_nonsig_corr_wgcna <- lm(data = subset(ciiider_upreg_wgcna, significance == "non-sig"), MODULE_MEMBERSHIP ~ Log2.Enrichment)
+summary(lm_nonsig_corr_wgcna)
+```
 
 Plot CiiiDER enrichment versus WGCNA module membership.
 ```{r}
@@ -546,73 +598,17 @@ ciiider_upreg_wgcna <- mutate(ciiider_upreg_wgcna,
                                                      moduleColors == "blue" ~ "sig_neg_corr",
                                                      moduleColors == "darkorange2" ~ "sig_neg_corr",
                                                      TRUE ~ "non-sig"))
-# Check module colors for plotting
-#unique(ciiider_upreg_wgcna$moduleColors)
 
 # Change the module colors "white" to "gray95" which is more visible
 ciiider_upreg_wgcna_col_changed <- mutate(ciiider_upreg_wgcna, 
                           moduleColors = replace(moduleColors, moduleColors == "white", "gray95"))
-
-# Plot
-p <- ggplot(data = ciiider_upreg_wgcna_col_changed,
-            aes(x = Log2.Enrichment, y = MODULE_MEMBERSHIP, 
-                shape = significance, label = Transcription.Factor.Name)) +
-  # Scatterplot, color points by module color
-  geom_point(color = ciiider_upreg_wgcna_col_changed$moduleColors, size = 3) +
-  # Regression line (linear model) without confidence interval
-  geom_smooth(method = "lm", se = FALSE, fullrange = TRUE, aes(color = significance)) +
-  # Colors of regression lines, legend format
-  scale_color_manual(values = c("gray75", "gray40", "black"), 
-                     name = "Network Correlation \nto Habitat", 
-                     labels = c("p > 0.05", "Negative, p < 0.05", "Positive, p < 0.05")) +
-  # Shapes of points, legend format
-  scale_shape_manual(values = c(1, 17, 15), 
-                     name = "Network Correlation \nto Habitat", 
-                     labels = c("p > 0.05", "Negative, p < 0.05", "Positive, p < 0.05")) +
-  # Add TF labels
-  geom_text_repel(data = subset(x = ciiider_upreg_wgcna, subset = significance == "sig_pos_corr"),
-                  size = 3, hjust = 0, vjust = 0, segment.color = NA) +
-  # Add R^2 values
-  #stat_regline_equation(aes(label = ..rr.label..)) +
-  # x-axis title
-  xlab(bquote(~ Log[2] ~ "Enrichment")) +
-  # y-axis title
-  ylab("Module Membership") +
-  # Theme
-  theme_classic()
-p
-ggsave(filename = "~/Documents/WSU/RESEARCH/pmex_gills_csrna_2021/19_intersect_DI_and_DE_genes/05_module_membership_vs_log2_enrichment.pdf", plot = p, width = 10, height = 7)
 ```
 
-Linear regressions.
-```{r}
-lm_sig_pos_corr_wgcna <- lm(data = subset(ciiider_upreg_wgcna, significance == "sig_pos_corr"), MODULE_MEMBERSHIP ~ Log2.Enrichment)
-summary(lm_sig_pos_corr_wgcna)
-```
-```{r}
-lm_sig_neg_corr_wgcna <- lm(data = subset(ciiider_upreg_wgcna, significance == "sig_neg_corr"), MODULE_MEMBERSHIP ~ Log2.Enrichment)
-summary(lm_sig_neg_corr_wgcna)
-```
-```{r}
-lm_nonsig_corr_wgcna <- lm(data = subset(ciiider_upreg_wgcna, significance == "non-sig"), MODULE_MEMBERSHIP ~ Log2.Enrichment)
-summary(lm_nonsig_corr_wgcna)
-```
-
-Plot same as above but split by network correlation to habitat.
 ```{r}
 # Re-title plots
 plot_names <- c(`non-sig` = "Not correlated, p > 0.05",
                 `sig_neg_corr` = "Negatively correlated, p < 0.05",
                 `sig_pos_corr` = "Positively correlated, p < 0.05")
-
-# Make a data frame of slopes and intercepts from the non-parametric linear regressions.
-#ablines <- data.frame(significance = c("non-sig", "sig_neg_corr", "sig_pos_corr"),
-#                    slope = c(as.numeric(summary(lm_nonpar_nonsig_corr_wgcna)$coefficients[2,1]),
-#                            as.numeric(summary(lm_nonpar_sig_neg_corr_wgcna)$coefficients[2,1]),
-#                            as.numeric(summary(lm_nonpar_sig_pos_corr_wgcna)$coefficients[2,1])),
-#                    int = c(as.numeric(summary(lm_nonpar_nonsig_corr_wgcna)$coefficients[1,1]),
-#                            as.numeric(summary(lm_nonpar_sig_neg_corr_wgcna)$coefficients[1,1]),
-#                            as.numeric(summary(lm_nonpar_sig_pos_corr_wgcna)$coefficients[1,1])))
 
 # Plot
 # Removed <label = Transcription.Factor.Name> to get rid of TF labels
@@ -636,29 +632,13 @@ p_fac_wrap <- ggplot(data = ciiider_upreg_wgcna_col_changed, aes(x = Log2.Enrich
   # Theme
   theme_classic()
 p_fac_wrap
-ggsave(filename = "~/Documents/WSU/RESEARCH/pmex_gills_csrna_2021/19_intersect_DI_and_DE_genes/05_module_membership_vs_log2_enrichment_facet_wrap.pdf", plot = p_fac_wrap, width = 10, height = 7)
-```
-Kendall–Theil Sen Siegel nonparametric linear regressions. See [this website](https://rcompanion.org/handbook/F_12.html) for help.
-```{r}
-#lm_nonpar_sig_pos_corr_wgcna = mblm(data = subset(ciiider_upreg_wgcna, significance == "sig_pos_corr"), MODULE_MEMBERSHIP ~ Log2.Enrichment)
-#summary(lm_nonpar_sig_pos_corr_wgcna)
+ggsave(filename = "05_module_membership_vs_log2_enrichment_facet_wrap.pdf", plot = p_fac_wrap, width = 10, height = 7)
 ```
 
+#### Plot module membership per module for TF and non-TF genes
+Read in TRRUST v2 human dataset in TSV format (from https://www.grnpedia.org/trrust/downloadnetwork.php), downloaded 6/3/2020 (Release note (2018.04.16)).
 ```{r}
-#lm_nonpar_sig_neg_corr_wgcna = mblm(data = subset(ciiider_upreg_wgcna, significance == "sig_neg_corr"), MODULE_MEMBERSHIP ~ Log2.Enrichment)
-#summary(lm_nonpar_sig_neg_corr_wgcna)
-```
-
-```{r}
-#lm_nonpar_nonsig_corr_wgcna <- mblm(data = subset(ciiider_upreg_wgcna, significance == "non-sig"), MODULE_MEMBERSHIP ~ Log2.Enrichment)
-#summary(lm_nonpar_nonsig_corr_wgcna)
-```
-
-## Plot module membership per module for TF and non-TF genes
-
-Read in TRRUST v2 human dataset in TSV format (from https://www.grnpedia.org/trrust/downloadnetwork.php), downloaded 6/3/2020 (Release note (2018.04.16))
-```{r}
-trrust <- read.csv("~/Documents/WSU/RESEARCH/pmex_tf_biomed/7_edgeR_WGCNA/scripts/trrust_rawdata.human.tsv", sep = "\t", header = FALSE)
+trrust <- read.csv("trrust_rawdata.human.tsv", sep = "\t", header = FALSE)
 
 # Add column names
 colnames(trrust) <- c("transcription_factor", "target_gene", "relationship", "pubmed_interaction_IDs")
@@ -691,18 +671,7 @@ Plot gene significance and module membership across all network modules.
 module_colors <- sort(unique(wgcna_split_MM_pval_sig$moduleColors))
 module_colors
 
-
-ggplot(data = wgcna_tfs_labeled, aes(y = GS.habitat_wild, group = TF)) +
-  geom_boxplot() +
-  ylab("Gene Significance") +
-  facet_wrap(~ moduleColors, nrow = 1) +
-  theme(legend.position = "none",
-        axis.title.x=element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank())
-```
-Add column with correlation to habitat.
-```{r}
+# Add column with correlation to habitat
 wgcna_tfs_sig_labeled <- mutate(wgcna_tfs_labeled,
                             significance = case_when(moduleColors == "black" ~ "sig_pos_corr",
                                                      moduleColors == "salmon4" ~ "sig_pos_corr",
@@ -718,24 +687,8 @@ wgcna_tfs_sig_labeled <- mutate(wgcna_tfs_labeled,
                                                      moduleColors == "blue" ~ "sig_neg_corr",
                                                      moduleColors == "darkorange2" ~ "sig_neg_corr",
                                                      TRUE ~ "non-sig"))
-```
 
-Group by correlation to habitat.
-```{r}
-# Gene significance
-ggplot(data = wgcna_tfs_sig_labeled, aes(y = GS.habitat_wild), fill = moduleColors) +
-  geom_boxplot(aes(fill = moduleColors)) +
-  facet_grid(~ significance)
-
-# Module membership
-ggplot(data = wgcna_tfs_sig_labeled, aes(y = MODULE_MEMBERSHIP), fill = moduleColors) +
-  geom_boxplot(aes(fill = moduleColors)) +
-  facet_grid(~ significance)
-
-plot_names <- c(`non-sig` = "Not correlated, p > 0.05",
-                `sig_neg_corr` = "Negatively correlated, p < 0.05",
-                `sig_pos_corr` = "Positively correlated, p < 0.05")
-
+# Group by correlation to habitat
 # Gene significance
 p_gs <- ggplot(data = wgcna_tfs_sig_labeled, aes(y = MODULE_MEMBERSHIP, fill = TF)) +
   geom_boxplot() +
@@ -746,7 +699,7 @@ p_gs <- ggplot(data = wgcna_tfs_sig_labeled, aes(y = MODULE_MEMBERSHIP, fill = T
   theme_classic()
 p_gs + theme(axis.text.x=element_blank(),
              axis.ticks.x=element_blank())
-ggsave(filename = "~/Documents/WSU/RESEARCH/pmex_gills_csrna_2021/19_intersect_DI_and_DE_genes/06_tf_vs_non-tf_gene_significance_facet_wrap.pdf", plot = p_gs + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()))
+ggsave(filename = "06_tf_vs_non-tf_gene_significance_facet_wrap.pdf", plot = p_gs + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()))
 
 # Module membership
 p_mm <- ggplot(data = wgcna_tfs_sig_labeled, aes(y = GS.habitat_wild, fill = TF)) +
@@ -758,22 +711,13 @@ p_mm <- ggplot(data = wgcna_tfs_sig_labeled, aes(y = GS.habitat_wild, fill = TF)
   theme_classic()
 p_mm + theme(axis.text.x=element_blank(),
              axis.ticks.x=element_blank())
-ggsave(filename = "~/Documents/WSU/RESEARCH/pmex_gills_csrna_2021/19_intersect_DI_and_DE_genes/06_tf_vs_non-tf_module_membership_facet_wrap.pdf", plot = p_mm + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()))
+ggsave(filename = "06_tf_vs_non-tf_module_membership_facet_wrap.pdf", plot = p_mm + theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()))
 ```
 
 ### Alluvial Diagram
 Subsequent analyses in this section were run using R (v.4.0.3).
 
-Install packages.
-```{r}
-install.packages("ggforce")
-```
-Load packages.
-```
-library(ggforce)
-```
-
-Read in data frame to be plotted. Variables are numbered so they order properly in alluvial diagram.
+Read in data frame (manually edited to include Unannotated = 0 where necessary). Variables are numbered so they order properly in alluvial diagram.
 ```{r}
 alluvial_df <- read.csv("03_alluvial_nodes_and_edges_edited.csv", header = TRUE)
 ```
@@ -803,5 +747,5 @@ p <- ggplot(alluvial_df_x3, aes(x, id = id, split = y, value = Freq)) +
   geom_parallel_sets_labels(colour = 'black', size = 4) + 
   theme_void()
 p2 <- p + theme(legend.position="none")
-ggsave(filename = "~/Documents/WSU/RESEARCH/pmex_gills_csrna_2021/23_alluvial_diagram/01_alluvial_plot.pdf", plot = p2, width = 15, height = 10)
+ggsave(filename = "01_alluvial_plot.pdf", plot = p2, width = 15, height = 10)
 ```
