@@ -121,18 +121,18 @@ grep -v "STRG" gene_count_matrix.csv > gene_count_matrix_no_STRG.csv
 grep -v "STRG" transcript_count_matrix.csv > transcript_count_matrix_no_STRG.csv
 ```
 
-### Network Analysis (Weighted Gene Co-expression Network Analysis, WGCNA)
-#### WGCNA Part 1
-Subsequent analyses in this section were run using R (v.3.6.0).
+All subsequent analyses were run using R (v.3.6.0 for WGCNA, v.4.0.3 for EdgeR).
 
 Install packages.
 ```{r}
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 
+install.packages("data.table")
 install.packages("dplyr")
 BiocManager::install("edgeR")
 install.packages("ggplot2")
+BiocManager::install("limma")
 install.packages("scales")
 install.packages("splitstackshape")
 install.packages("tidyr")
@@ -141,14 +141,19 @@ BiocManager::install("WGCNA")
 
 Load packages.
 ```{r}
+library(data.table)
 library(dplyr)
 library(edgeR)
 library(ggplot2)
+library(limma)
 library(scales)
 library(splitstackshape)
 library(tidyr)
 library(WGCNA)
 ```
+
+### Network Analysis (Weighted Gene Co-expression Network Analysis, WGCNA)
+#### WGCNA Part 1
 
 Read in gene counts matrix.
 ```{r}
@@ -1697,3 +1702,170 @@ TacoWild_corr_p_uniq_desc <- TacoWild_corr_p_uniq[order(-TacoWild_corr_p_uniq$Co
 # Save as a CSV file
 write.csv(x = TacoWild_corr_p_uniq_desc, file = "15_wild_taco_all_sig_modules_corr_pvalues_tfs.csv")
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Differential Gene Expression in EdgeR
+Read in gene counts matrix from StringTie, above.
+```{r}
+wild_data <- read.csv(file = 'gene_count_matrix_no_STRG.csv', row.names = 1)
+```
+
+Create grouping factors to be incorporated later into the DGELists
+```{r}
+# S = sulfidic, NS = non-sulfidic
+group = c(rep("NS", 6), rep("S", 6), rep("S", 5), rep("NS", 6), rep("NS", 6), rep("S", 6))
+```
+
+Create DGEList object.
+```{r}
+y <- DGEList(counts=wild_data, group=group)
+```
+
+Calculate dimensions of dataset before filtering.
+```{r}
+cat("y dimensions pre-filtering:", dim(y$counts), "genes and samples, respectively")
+```
+
+Filter data. 
+```{r}
+# Sort samples by library size
+y_sorted <- y$samples[order(y$samples$lib.size) , ]
+y_sorted
+# Select lowest library size
+lowest_library_size <- y_sorted$lib.size[1]
+# Print lowest library size
+cat("Smallest wild library size:", lowest_library_size)
+# Calculate minimum counts per million (cpm) to have ~5 counts in the smallest library, as per edgeR manual recommendations
+  # (5)/(lowest_library_size)=(x_wild)/(1,000,000)
+  # Solve for x_wild
+x <- (5*1000000)/lowest_library_size
+# Print minimum cpm
+cat("\n")
+cat("Minimum wild cpm:", x)
+# Samples must have a cpm of at least 1.144 (~5 counts in smallest library) and be present in at least 5 samples
+keep <- rowSums(cpm(y) >= 1.144) >= 5
+filtered_y <- y[keep, , keep.lib.sizes=FALSE]
+# Library sizes post-filtering
+filtered_y$samples
+```
+
+Dimensions of dataset after filtering.
+```{r}
+cat("filtered_y dimensions post-filtering:", dim(filtered_y$counts), "genes and samples, respectively")
+```
+
+Normalize for RNA composition (i.e., prevents genes from appearing falsely downregulated). Calculates normalization factors to scale raw library sizes, TMM is default method, to create effective library sizes.
+```{r}
+filtered_y <- calcNormFactors(filtered_y)
+```
+
+Create design matrix.
+```{r}
+design <- model.matrix(~0+group, data=y$samples) # 0 is the intercept
+colnames(design) <- levels(y$samples$group)
+design
+```
+Estimating Dispersions - CR method. Uses GLM instead of qCML method because testing multiple factors here. Also uses Cox-Reid profile-adjusted likelihood.
+```{r}
+# Estimate common dispersion and tagwise dispersions in one run
+filtered_y <- estimateDisp(filtered_y, design)
+# Common dispersions
+filtered_y$common.dispersion
+# Tagwise (gene-specific) dispersions
+summary(filtered_y$tagwise.dispersion)
+# Estimated prior degrees of freedom
+filtered_y$prior.df
+```
+
+BCV plot.
+```{r}
+BCV <- plotBCV(filtered_y)
+```
+
+Save counts per million (CPM).
+```{r}
+cpm <- cpm(filtered_y)
+write.csv(x=cpm, file = "3_wild_cpm.csv")
+```
+
+Measure differential gene expression using quasi-likelihood F-tests. Quasi-likelihood F-tests are better for bulk RNA-seq data because they have stricter error rate control, account for uncertainty in dispersion estimation.
+```{r}
+# Habitat 
+# Make QL model representing the study design fitted to the data
+fit <- glmQLFit(filtered_y, design)
+
+# Make a contrast vector to compare SULFIDIC samples to NON-SULFIDIC samples
+S_vs_NS_contrast <- makeContrasts(S-NS, levels = design)
+S_vs_NS_contrast
+qlf_habitat <- glmQLFTest(fit, contrast=S_vs_NS_contrast)
+
+# n = Inf means report all genes
+habitat_S_vs_NS <- topTags(qlf_habitat, n = Inf)
+habitat_S_vs_NS <- data.frame(habitat_S_vs_NS)
+
+# Write CSV of QL F-test results
+write.csv(x=habitat_S_vs_NS, file = "~/Documents/WSU/RESEARCH/pmex_tf_biomed/8_edgeR_for_DGE/4_habitat_wild_qlf_S_vs_NS_RAW.csv")
+
+# Move gene IDs to column 1
+habitat_S_vs_NS <- setDT(habitat_S_vs_NS, keep.rownames = TRUE)[]
+
+# Rename first column
+names(habitat_S_vs_NS)[1] <- "geneID"
+head(habitat_S_vs_NS)
+
+# Read in PmexGeneNameMatching from Courtney Passow
+PmexGeneNameMatching <- read.csv(file = "~/Documents/WSU/RESEARCH/pmex_tf_biomed/8_edgeR_for_DGE/scripts/PmexGeneNameMatching.csv")
+
+# Make row 1 the headers for the columns
+names(PmexGeneNameMatching) <- as.matrix(PmexGeneNameMatching[1, ])
+PmexGeneNameMatching <- PmexGeneNameMatching[-1, ]
+PmexGeneNameMatching[] <- lapply(PmexGeneNameMatching, function(x) type.convert(as.character(x)))
+head(PmexGeneNameMatching)
+
+# Merge habitat_wild_S_vs_NS and PmexGeneNameMatching by gene ID
+merged_habitat_S_vs_NS <- merge(x = habitat_S_vs_NS, y = PmexGeneNameMatching, by.x = "geneID", by.y = "gene.ID", all.x = TRUE)
+
+# Read in BLAST2GO file from Courtney Passow
+anno <- read.csv(file = "~/Documents/WSU/RESEARCH/pmex_tf_biomed/8_edgeR_for_DGE/scripts/annotations_from_cpassow.csv", row.names = 1)
+
+# Merge merged_habitat_wild_S_vs_NS and anno by gene ID
+merged_x2_habitat_S_vs_NS <- merge(x = merged_habitat_S_vs_NS, y = anno, by.x = "geneID", by.y = "geneID", all.x = TRUE)
+
+# Subset data frame to only contain relevant columns in an order that makes sense
+merged_x2_habitat_S_vs_NS_subset <- merged_x2_habitat_S_vs_NS[,c(1,7,11,2:6,22)]
+
+# Re-order by FDR
+# FDR < 0.05 considered significant
+sorted_habitat_S_vs_NS <- merged_x2_habitat_S_vs_NS_subset[order(FDR),]
+
+# Write CSV of QL F-test results with annotations
+write.csv(x=sorted_habitat_S_vs_NS, file = "~/Documents/WSU/RESEARCH/pmex_tf_biomed/8_edgeR_for_DGE/5_habitat_qlf_S_vs_NS_WITH_ANNOTATIONS.csv")
+```
+
+
