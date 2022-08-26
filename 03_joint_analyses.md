@@ -619,12 +619,6 @@ p_fac_wrap <- ggplot(data = ciiider_upreg_wgcna_col_changed, aes(x = Log2.Enrich
   facet_wrap(~significance, labeller = as_labeller(plot_names)) +
   # Regression line (linear model) without confidence interval
   geom_smooth(method = "lm", se = FALSE, fullrange = TRUE, color = "black") +
-  # Colors of regression lines, legend format
-  # Add non-parametric regression lines <- OLD
-  #geom_abline(data = ablines, aes(slope = slope, intercept = int)) +
-  # Add TF labels
-  #geom_text_repel(data = subset(x = ciiider_upreg_wgcna),
-  #                size = 3, hjust = 0, vjust = 0, segment.color = NA) +
   # x-axis title
   xlab(bquote(~ Log[2] ~ "Enrichment")) +
   # y-axis title
