@@ -1814,9 +1814,8 @@ cpm <- cpm(filtered_y)
 write.csv(x=cpm, file = "3_wild_cpm.csv")
 ```
 
-Measure differential gene expression using quasi-likelihood F-tests. Quasi-likelihood F-tests are better for bulk RNA-seq data because they have stricter error rate control, account for uncertainty in dispersion estimation.
-```{r}
-# Habitat 
+Measure differential gene expression using quasi-likelihood F-tests.
+```{r} 
 # Make QL model representing the study design fitted to the data
 fit <- glmQLFit(filtered_y, design)
 
@@ -1825,34 +1824,34 @@ S_vs_NS_contrast <- makeContrasts(S-NS, levels = design)
 S_vs_NS_contrast
 qlf_habitat <- glmQLFTest(fit, contrast=S_vs_NS_contrast)
 
-# n = Inf means report all genes
 habitat_S_vs_NS <- topTags(qlf_habitat, n = Inf)
 habitat_S_vs_NS <- data.frame(habitat_S_vs_NS)
 
 # Write CSV of QL F-test results
-write.csv(x=habitat_S_vs_NS, file = "~/Documents/WSU/RESEARCH/pmex_tf_biomed/8_edgeR_for_DGE/4_habitat_wild_qlf_S_vs_NS_RAW.csv")
+write.csv(x=habitat_S_vs_NS, file = "4_habitat_wild_qlf_S_vs_NS_RAW.csv")
+```
 
+Add annotations.
+```{r}
 # Move gene IDs to column 1
 habitat_S_vs_NS <- setDT(habitat_S_vs_NS, keep.rownames = TRUE)[]
 
 # Rename first column
 names(habitat_S_vs_NS)[1] <- "geneID"
-head(habitat_S_vs_NS)
 
-# Read in PmexGeneNameMatching from Courtney Passow
-PmexGeneNameMatching <- read.csv(file = "~/Documents/WSU/RESEARCH/pmex_tf_biomed/8_edgeR_for_DGE/scripts/PmexGeneNameMatching.csv")
+# Read in annotations from README.md
+PmexGeneNameMatching <- read.csv(file = "PmexGeneNameMatching.csv")
 
 # Make row 1 the headers for the columns
 names(PmexGeneNameMatching) <- as.matrix(PmexGeneNameMatching[1, ])
 PmexGeneNameMatching <- PmexGeneNameMatching[-1, ]
 PmexGeneNameMatching[] <- lapply(PmexGeneNameMatching, function(x) type.convert(as.character(x)))
-head(PmexGeneNameMatching)
 
 # Merge habitat_wild_S_vs_NS and PmexGeneNameMatching by gene ID
 merged_habitat_S_vs_NS <- merge(x = habitat_S_vs_NS, y = PmexGeneNameMatching, by.x = "geneID", by.y = "gene.ID", all.x = TRUE)
 
-# Read in BLAST2GO file from Courtney Passow
-anno <- read.csv(file = "~/Documents/WSU/RESEARCH/pmex_tf_biomed/8_edgeR_for_DGE/scripts/annotations_from_cpassow.csv", row.names = 1)
+# Read in blast results from README.md
+anno <- read.csv(file = "Table\ S2", row.names = 1)
 
 # Merge merged_habitat_wild_S_vs_NS and anno by gene ID
 merged_x2_habitat_S_vs_NS <- merge(x = merged_habitat_S_vs_NS, y = anno, by.x = "geneID", by.y = "geneID", all.x = TRUE)
@@ -1865,7 +1864,7 @@ merged_x2_habitat_S_vs_NS_subset <- merged_x2_habitat_S_vs_NS[,c(1,7,11,2:6,22)]
 sorted_habitat_S_vs_NS <- merged_x2_habitat_S_vs_NS_subset[order(FDR),]
 
 # Write CSV of QL F-test results with annotations
-write.csv(x=sorted_habitat_S_vs_NS, file = "~/Documents/WSU/RESEARCH/pmex_tf_biomed/8_edgeR_for_DGE/5_habitat_qlf_S_vs_NS_WITH_ANNOTATIONS.csv")
+write.csv(x=sorted_habitat_S_vs_NS, file = 5_habitat_qlf_S_vs_NS_WITH_ANNOTATIONS.csv")
 ```
 
 
