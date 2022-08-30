@@ -1789,16 +1789,18 @@ Create design matrix.
 ```{r}
 design <- model.matrix(~0+group, data=y$samples) # 0 is the intercept
 colnames(design) <- levels(y$samples$group)
-design
 ```
 Estimating Dispersions - CR method. Uses GLM instead of qCML method because testing multiple factors here. Also uses Cox-Reid profile-adjusted likelihood.
 ```{r}
 # Estimate common dispersion and tagwise dispersions in one run
 filtered_y <- estimateDisp(filtered_y, design)
+
 # Common dispersions
 filtered_y$common.dispersion
+
 # Tagwise (gene-specific) dispersions
 summary(filtered_y$tagwise.dispersion)
+
 # Estimated prior degrees of freedom
 filtered_y$prior.df
 ```
