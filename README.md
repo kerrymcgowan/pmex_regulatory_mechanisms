@@ -1,5 +1,5 @@
 # pmex_regulatory_mechanisms
-Analyses and data for McGowan, K.L., Duttke, S., Arias-Rodriguez, L., Tobler, M., Kelley, J.L. (2022) "Nascent transcription reveals regulatory changes in extremophile fishes inhabiting hydrogen sulfide-rich springs".
+Analyses and data for McGowan, K.L., Duttke, S.H., Arias-Rodriguez, L., Tobler, M., Kelley, J.L. (2022) "Nascent transcription reveals regulatory changes in extremophile fishes inhabiting hydrogen sulfide-rich springs".
 
 Additional input files required for analyses are listed below.
 
