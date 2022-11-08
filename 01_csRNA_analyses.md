@@ -141,26 +141,28 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("edgeR")
 BiocManager::install("limma")
 
-install.packages("xlsx")
-install.packages("RColorBrewer")
-install.packages("pheatmap")
-install.packages("splitstackshape")
-install.packages("factoextra")
 install.packages("dplyr")
+install.packages("factoextra")
+install.packages("pheatmap")
+install.packages("RColorBrewer")
+install.packages("splitstackshape")
+install.packages("stats")
 install.packages("tidyr")
+install.packages("xlsx")
 ```
 
 Load required packages.
 ```{r, message = FALSE}
-library(edgeR)
-library(xlsx)
-library(RColorBrewer)
-library(pheatmap)
-library(limma)
-library(splitstackshape)
-library(factoextra)
 library(dplyr)
+library(edgeR)
+library(factoextra)
+library(limma)
+library(pheatmap)
+library(RColorBrewer)
+library(splitstackshape)
+library(stats)
 library(tidyr)
+library(xlsx)
 ```
 
 Read in EdgeR output from HOMER's getDiffExpression.pl.
@@ -234,7 +236,33 @@ print(eco_sig_pheatmap)
 dev.off()
 ```
 
-# Add PCA!!!
+Visualize samples using a principal components analysis (PCA).
+```{r}
+# Transpose the data frame
+t_subset_all_eco <- as.data.frame(t(subset_all_eco))
+
+# Compute the PCA
+ecotype_pca <- prcomp(t_subset_all_eco, scale = TRUE)
+
+# Create ecotype and drainage vectors
+Ecotype <- c('NS', 'NS', 'S', 'S', 'S', 'S', 'NS', 'NS', 'NS', 'NS', 'S', 'S')
+Drainage <- c(rep('Pich', 4), rep('Puya', 4), rep('Taco', 4))
+
+# Plot the PCA
+ecotype_pca_plot <- ecotype_pca$x %>%
+  as.data.frame %>%
+  ggplot(aes(x=PC1,y=PC2)) +
+  geom_point(aes(color = Ecotype, shape = Drainage), size = 4) +
+  scale_color_manual(values = c("blue", "gold")) +
+  theme_classic() + 
+  xlim(-350, 250) +
+  ylim(-350, 250) +
+  labs(x = paste0("Principal Component 1: ", round(var_explained[1]*100, 2), "%"),
+       y = paste0("Principal Component 2: ", round(var_explained[2]*100, 2), "%"))
+
+# Save plot
+ggsave(filename = "03_ecotype_pca_plot.pdf", plot = ecotype_pca_plot, width = 7, height = 6)
+```
 
 Merge significant peaks with H<sub>2</sub>S-related candidate list. The Sulfide Detox/Response Gene Set is relevant for this study. The NuclearRef and Broughton Gene Sets are reference sets.
 ```{r}
