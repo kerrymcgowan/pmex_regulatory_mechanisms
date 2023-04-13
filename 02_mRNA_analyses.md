@@ -106,7 +106,7 @@ Generate gene and transcript counts matrices. `sample_list.txt` contains sample 
 ```{bash}
 module load python/2.7.10
 
-python prepDE.py \
+python prepDE-2019-10-01_edited.py \
   -i sample_list.txt \
   -g gene_count_matrix.csv \
   -t transcript_count_matrix.csv
